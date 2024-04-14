@@ -1,0 +1,28 @@
+.project-list {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 36px;
+}
+
+.project-list__project {
+  border: 1px solid #eee;
+  box-shadow: 4px 5px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  max-width: 400px;
+  margin: 20px auto;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.project-list__project p,
+h2 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.project-list__project button {
+  background-color: #555;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding: 12px;
+}

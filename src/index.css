@@ -25,3 +25,18 @@ h4 {
 ul {
   list-style-type: none;
 }
+
+.btn {
+  background: #ff4500;
+  color: #fff;
+  padding: 16px;
+  border: 0;
+  border-radius: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+  width: fit-content;
+  min-width: 100px;
+  display: block;
+  margin-top: 16px;
+}
