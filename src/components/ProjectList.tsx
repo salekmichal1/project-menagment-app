@@ -8,6 +8,7 @@ export default function ProjectList() {
     JSON.parse(localStorage.getItem('projects') || '[]')
   );
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
 
   useEffect(() => {
     localStorage.setItem('projects', JSON.stringify(projects));
@@ -18,6 +19,21 @@ export default function ProjectList() {
       return [...prevProjects, newProject];
     });
 
+    setShowModal(false);
+  };
+
+  const editProject = function (editedProject: Project): void {
+    const targetIndex = projects.findIndex(
+      project => project.id === editedProject.id
+    );
+
+    const editedArray = [
+      ...projects.slice(0, targetIndex),
+      editedProject,
+      ...projects.slice(targetIndex + 1),
+    ];
+
+    setProjects(editedArray);
     setShowModal(false);
   };
 
@@ -45,7 +61,18 @@ export default function ProjectList() {
           <div key={project.id} className="project-list__project">
             <h2>{project.title}</h2>
             <p>{project.description}</p>
-            <button className="btn">Edit</button>
+            <button
+              className="btn"
+              onClick={() => {
+                setShowModal(true);
+                setProjectToEdit({
+                  id: project.id,
+                  title: project.title,
+                  description: project.description,
+                });
+              }}>
+              Edit
+            </button>
             <button className="btn" onClick={() => handleDelete(project.id)}>
               Delete
             </button>
@@ -56,6 +83,8 @@ export default function ProjectList() {
         <NewProjectForm
           addNewProject={addNewProject}
           handleClose={handleClose}
+          projectToEdit={projectToEdit}
+          editProject={editProject}
         />
       )}
     </div>
