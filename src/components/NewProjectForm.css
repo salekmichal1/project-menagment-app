@@ -17,8 +17,7 @@
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
-.new-project-form label,
-.new-project-form input {
+.new-project-form label {
   display: block;
   text-align: left;
   width: 100%;
@@ -26,4 +25,12 @@
   padding: 10px;
   box-sizing: border-box;
   font-size: 1.2em;
+}
+
+.new-project-form input {
+  width: 100%;
+  font-size: 1.2em;
+  border: 1px solid #000;
+  border-radius: 2px;
+  padding: 4px 10px;
 }
