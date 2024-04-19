@@ -15,7 +15,7 @@
 }
 
 .project-list__project p,
-h2 {
+.project-list__project h2 {
   margin-top: 20px;
   margin-bottom: 20px;
 }

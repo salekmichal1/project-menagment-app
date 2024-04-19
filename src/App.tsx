@@ -1,6 +1,8 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import Projects from './pages/Projects';
 
 function App() {
   if (
@@ -9,10 +11,18 @@ function App() {
   ) {
     localStorage.setItem('projects', JSON.stringify([]));
   }
+  if (localStorage.getItem('projectInWork') === null) {
+    localStorage.setItem('projectInWork', '');
+  }
   return (
     <div className="App">
-      <Navbar />
-      <Home />
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/projects" element={<Projects />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

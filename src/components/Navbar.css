@@ -1,6 +1,32 @@
 .navbar {
   width: 100%;
-  padding: 20px;
+  padding: 20px 100px;
   background-color: #aa0010;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar__list {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  list-style-type: none;
+  gap: 10px;
+}
+
+.navbar__list-item {
+  border-right: 1px solid white;
+  padding-right: 10px;
+}
+
+.navbar__list-item:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.navbar__list-link {
+  text-decoration: none;
+  text-transform: uppercase;
   color: #fff;
 }

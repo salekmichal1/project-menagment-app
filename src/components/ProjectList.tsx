@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Project } from '../model/project';
 import NewProjectForm from './NewProjectForm';
 import './ProjectList.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>(
@@ -10,11 +11,13 @@ export default function ProjectList() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     localStorage.setItem('projects', JSON.stringify(projects));
   }, [projects]);
 
-  const addNewProject = function (newProject: Project): void {
+  const handleAddNewProject = function (newProject: Project): void {
     setProjects(prevProjects => {
       return [...prevProjects, newProject];
     });
@@ -22,7 +25,7 @@ export default function ProjectList() {
     setShowModal(false);
   };
 
-  const editProject = function (editedProject: Project): void {
+  const handleEditProject = function (editedProject: Project): void {
     const targetIndex = projects.findIndex(
       project => project.id === editedProject.id
     );
@@ -41,6 +44,11 @@ export default function ProjectList() {
     setShowModal(false);
   };
 
+  const handleSelectProject = function (id: string) {
+    localStorage.setItem('projectInWork', id);
+    navigate('/');
+  };
+
   const handleDelete = function (id: string) {
     setProjects(prevProjects => {
       return prevProjects.filter(project => {
@@ -56,6 +64,9 @@ export default function ProjectList() {
         onClick={() => setShowModal(true)}>
         Add new project
       </button>
+      {localStorage.getItem('projectInWork') === '' && (
+        <h3>None of the projects were selected</h3>
+      )}
       <div className="project-list__list">
         {projects.map(project => (
           <div key={project.id} className="project-list__project">
@@ -73,6 +84,11 @@ export default function ProjectList() {
               }}>
               Edit
             </button>
+            <button
+              className="btn"
+              onClick={() => handleSelectProject(project.id)}>
+              Select
+            </button>
             <button className="btn" onClick={() => handleDelete(project.id)}>
               Delete
             </button>
@@ -81,10 +97,10 @@ export default function ProjectList() {
       </div>
       {showModal && (
         <NewProjectForm
-          addNewProject={addNewProject}
+          addNewProject={handleAddNewProject}
           handleClose={handleClose}
           projectToEdit={projectToEdit}
-          editProject={editProject}
+          editProject={handleEditProject}
         />
       )}
     </div>
