@@ -5,14 +5,22 @@ import './NewProjectForm.css';
 interface FuncProps {
   addNewProject(newProject: Project): void;
   handleClose(): void;
+  projectToEdit: Project | null;
+  editProject(editedProject: Project): void;
 }
 
 export default function NewProjectForm({
   addNewProject,
   handleClose,
+  projectToEdit,
+  editProject,
 }: FuncProps) {
-  const [title, setTitle] = useState<string>('');
-  const [desctription, setDesctripiton] = useState<string>('');
+  const [title, setTitle] = useState<string>(
+    projectToEdit === null ? '' : projectToEdit.title
+  );
+  const [desctription, setDesctripiton] = useState<string>(
+    projectToEdit === null ? '' : projectToEdit.description
+  );
 
   const resetForm = function () {
     setTitle('');
@@ -22,15 +30,29 @@ export default function NewProjectForm({
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const id = crypto.randomUUID();
-    const project: Project = {
-      id: id,
-      title: title,
-      description: desctription,
-    };
-    console.log(project);
-    addNewProject(project);
-    resetForm();
+    if (projectToEdit === null) {
+      const id = crypto.randomUUID();
+      const project: Project = {
+        id: id,
+        title: title,
+        description: desctription,
+      };
+      console.log(project);
+      addNewProject(project);
+      resetForm();
+    }
+
+    if (projectToEdit !== null) {
+      const editedProject: Project = {
+        id: projectToEdit.id,
+        title: title,
+        description: desctription,
+      };
+      console.log(editedProject);
+
+      editProject(editedProject);
+      resetForm();
+    }
   };
 
   return (
