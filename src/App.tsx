@@ -3,7 +3,7 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
-import { log } from 'console';
+import { error, log } from 'console';
 
 function App() {
   if (
@@ -19,8 +19,14 @@ function App() {
   const fetchData = async function () {
     try {
       const testApi = await fetch('http://localhost:3001/');
-      return testApi;
-    } catch {}
+      if (!testApi.ok) {
+        throw Error(testApi.statusText);
+      }
+      const testApiData = await testApi;
+      console.log(testApiData);
+    } catch (err) {
+      console.error(err);
+    }
   };
   console.log(fetchData());
 
