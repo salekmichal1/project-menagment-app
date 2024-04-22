@@ -17,7 +17,8 @@ export default function Home() {
     if (selectedProject === undefined) {
       navigate('/projects');
     }
-  }, []);
+  }, [navigate, selectedProject]);
+  
   return (
     <div>
       <h2>Selected project</h2>

@@ -3,7 +3,6 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
-import { error, log } from 'console';
 
 function App() {
   if (
@@ -18,17 +17,17 @@ function App() {
 
   const fetchData = async function () {
     try {
-      const testApi = await fetch('http://localhost:3001/');
+      const testApi = await fetch('http://localhost:3000/res');
       if (!testApi.ok) {
         throw Error(testApi.statusText);
       }
-      const testApiData = await testApi;
+      const testApiData: string = await testApi.json()
       console.log(testApiData);
     } catch (err) {
       console.error(err);
     }
   };
-  console.log(fetchData());
+  fetchData()
 
   return (
     <div className="App">
