@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Project } from '../model/project';
+import { Project } from '../model/Project';
 import './NewProjectForm.css';
 
 interface FuncProps {
@@ -15,16 +15,17 @@ export default function NewProjectForm({
   projectToEdit,
   editProject,
 }: FuncProps) {
+
   const [title, setTitle] = useState<string>(
     projectToEdit === null ? '' : projectToEdit.title
   );
-  const [desctription, setDesctripiton] = useState<string>(
+  const [description, setDescripiton] = useState<string>(
     projectToEdit === null ? '' : projectToEdit.description
   );
 
   const resetForm = function () {
     setTitle('');
-    setDesctripiton('');
+    setDescripiton('');
   };
 
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {
@@ -35,9 +36,8 @@ export default function NewProjectForm({
       const project: Project = {
         id: id,
         title: title,
-        description: desctription,
+        description: description,
       };
-      console.log(project);
       addNewProject(project);
       resetForm();
     }
@@ -46,7 +46,7 @@ export default function NewProjectForm({
       const editedProject: Project = {
         id: projectToEdit.id,
         title: title,
-        description: desctription,
+        description: description,
       };
       console.log(editedProject);
 
@@ -72,8 +72,8 @@ export default function NewProjectForm({
           <span>Project description:</span>
           <input
             type="text"
-            onChange={event => setDesctripiton(event.target.value)}
-            value={desctription}
+            onChange={event => setDescripiton(event.target.value)}
+            value={description}
             // ref={title}
           />
         </label>

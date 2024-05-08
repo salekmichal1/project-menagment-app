@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Project } from '../model/project';
+import { Project } from '../model/Project';
 import NewProjectForm from './NewProjectForm';
 import './ProjectList.css';
 import { useNavigate } from 'react-router-dom';
@@ -50,6 +50,10 @@ export default function ProjectList() {
   };
 
   const handleDelete = function (id: string) {
+    if(id === localStorage.getItem('projectInWork')){
+      localStorage.setItem('projectInWork', '')
+    }
+    
     setProjects(prevProjects => {
       return prevProjects.filter(project => {
         return id !== project.id;

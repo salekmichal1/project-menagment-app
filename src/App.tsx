@@ -14,6 +14,12 @@ function App() {
   if (localStorage.getItem('projectInWork') === null) {
     localStorage.setItem('projectInWork', '');
   }
+  if (
+    localStorage.getItem('userStories') === null ||
+    localStorage.getItem('userStories') === ''
+  ) {
+    localStorage.setItem('userStories', JSON.stringify([]));
+  }
 
   const fetchData = async function () {
     try {
@@ -21,8 +27,8 @@ function App() {
       if (!testApi.ok) {
         throw Error(testApi.statusText);
       }
-      const testApiData: string = await testApi.json()
-      console.log(testApiData);
+      const testApiData = await testApi.json()
+      console.log(testApiData.mess);
     } catch (err) {
       console.error(err);
     }
