@@ -47,6 +47,7 @@ export default function UserStoriesList() {
     
       const handleClose = () => {
         setShowModal(false);
+        setUserStoryToEdit(null);
       };
 
   return (
@@ -54,7 +55,7 @@ export default function UserStoriesList() {
         <h2>User stories list</h2>
       <button
         className="user-stories-list__btn btn"
-        onClick={() => {setShowModal(true); setUserStoryToEdit(null)}}>
+        onClick={() => setShowModal(true)}>
         Add new user story
       </button>
       <div className="user-stories-list__list">
@@ -91,6 +92,7 @@ export default function UserStoriesList() {
         handleAddNewUserStory={handleAddNewUserStory}
           handleClose={handleClose}
           userStoryToEdit={userStoryToEdit}
+          setUserStoryToEdit={setUserStoryToEdit}
           handleEditUserStory={handleEditUserStory}
         />
       )}

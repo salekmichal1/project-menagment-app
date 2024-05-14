@@ -42,6 +42,7 @@ export default function ProjectList() {
 
   const handleClose = () => {
     setShowModal(false);
+    setProjectToEdit(null);
   };
 
   const handleSelectProject = function (id: string) {
@@ -105,6 +106,7 @@ export default function ProjectList() {
           handleClose={handleClose}
           projectToEdit={projectToEdit}
           editProject={handleEditProject}
+          setProjectToEdit={setProjectToEdit}
         />
       )}
     </div>

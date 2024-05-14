@@ -21,19 +21,19 @@ function App() {
     localStorage.setItem('userStories', JSON.stringify([]));
   }
 
-  const fetchData = async function () {
-    try {
-      const testApi = await fetch('http://localhost:3000/res');
-      if (!testApi.ok) {
-        throw Error(testApi.statusText);
-      }
-      const testApiData = await testApi.json()
-      console.log(testApiData.mess);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  fetchData()
+  // const fetchData = async function () {
+  //   try {
+  //     const testApi = await fetch('http://localhost:3000/res');
+  //     if (!testApi.ok) {
+  //       throw Error(testApi.statusText);
+  //     }
+  //     const testApiData = await testApi.json()
+  //     console.log(testApiData.mess);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+  // fetchData()
 
   return (
     <div className="App">

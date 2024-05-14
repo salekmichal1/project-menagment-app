@@ -7,6 +7,7 @@ interface FuncProps {
   handleClose(): void;
   projectToEdit: Project | null;
   editProject(editedProject: Project): void;
+  setProjectToEdit:  React.Dispatch<React.SetStateAction<Project | null>>;
 }
 
 export default function NewProjectForm({
@@ -14,6 +15,7 @@ export default function NewProjectForm({
   handleClose,
   projectToEdit,
   editProject,
+  setProjectToEdit,
 }: FuncProps) {
 
   const [title, setTitle] = useState<string>(
@@ -26,6 +28,7 @@ export default function NewProjectForm({
   const resetForm = function () {
     setTitle('');
     setDescripiton('');
+    setProjectToEdit(null);
   };
 
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {

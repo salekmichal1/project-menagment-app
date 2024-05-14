@@ -3,30 +3,23 @@ import { UserStory } from '../model/UserStory';
 import './NewStoryForm.css'
 import { useAuthContext } from '../hooks/useAuthContext';
 
-export default function NewStoryForm({handleAddNewUserStory, handleClose, handleEditUserStory, userStoryToEdit}: {
-handleAddNewUserStory(newStory: UserStory): void;
-handleClose(): void;
-handleEditUserStory(editedUserStory: UserStory): void;
-userStoryToEdit: UserStory | null;
+export default function NewStoryForm({ handleAddNewUserStory, handleClose, handleEditUserStory, setUserStoryToEdit, userStoryToEdit }: {
+  handleAddNewUserStory(newStory: UserStory): void;
+  handleClose(): void;
+  handleEditUserStory(editedUserStory: UserStory): void;
+  setUserStoryToEdit: React.Dispatch<React.SetStateAction<UserStory | null>>;
+  userStoryToEdit: UserStory | null;
 }) {
   const { state } = useAuthContext();
-  const [name, setName] = useState<string>('');
-  const [description, setDesctripiton] = useState<string>('');
+  const [name, setName] = useState<string>(userStoryToEdit === null ? '' : userStoryToEdit.name);
+  const [description, setDesctripiton] = useState<string>(userStoryToEdit === null ? '' : userStoryToEdit.description);
 
-    console.log(userStoryToEdit);
-
-  useEffect(() => {
-  if(userStoryToEdit !== null){
-    setName(userStoryToEdit.name)
-    setDesctripiton(userStoryToEdit.description)
-  }
   console.log(userStoryToEdit);
-  
-  }, [])
-  
+
   const resetForm = function () {
     setName('');
     setDesctripiton('');
+    setUserStoryToEdit(null);
   };
 
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {
@@ -45,6 +38,7 @@ userStoryToEdit: UserStory | null;
         createdBy: `${state.user?.name} ${state.user?.surname}`
       };
       handleAddNewUserStory(userStory);
+      
       resetForm();
     }
 
@@ -73,7 +67,7 @@ userStoryToEdit: UserStory | null;
             type="text"
             onChange={event => setName(event.target.value)}
             value={name}
-            // ref={title}
+          // ref={title}
           />
         </label>
 
@@ -83,7 +77,7 @@ userStoryToEdit: UserStory | null;
             type="text"
             onChange={event => setDesctripiton(event.target.value)}
             value={description}
-            // ref={title}
+          // ref={title}
           />
         </label>
 
