@@ -9,4 +9,4 @@ export type Task = {
   endDate: Date;
   state: string; // todo/doing/done
   pinedUser: string; // id użytkownika
-}
+};

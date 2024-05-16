@@ -3,6 +3,7 @@ import './App.css';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
+import Tasks from './pages/Tasks';
 
 function App() {
   if (
@@ -19,6 +20,12 @@ function App() {
     localStorage.getItem('userStories') === ''
   ) {
     localStorage.setItem('userStories', JSON.stringify([]));
+  }
+  if (
+    localStorage.getItem('tasks') === null ||
+    localStorage.getItem('tasks') === ''
+  ) {
+    localStorage.setItem('tasks', JSON.stringify([]));
   }
 
   // const fetchData = async function () {
@@ -42,6 +49,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/tasks/:storyId" element={<Tasks />} />
         </Routes>
       </BrowserRouter>
     </div>
