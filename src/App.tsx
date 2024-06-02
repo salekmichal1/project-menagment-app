@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import Tasks from './pages/Tasks';
+import { log } from 'console';
 
 function App() {
   if (
@@ -28,19 +29,7 @@ function App() {
     localStorage.setItem('tasks', JSON.stringify([]));
   }
 
-  const fetchData = async function () {
-    try {
-      const testApi = await fetch('http://localhost:3000');
-      if (!testApi.ok) {
-        throw Error(testApi.statusText);
-      }
-      const testApiData = await testApi.json();
-      console.log(testApiData.message);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  fetchData();
+  let refreshToken = '';
 
   const postData = async function () {
     try {
@@ -56,16 +45,24 @@ function App() {
       }
 
       const testApiData = await testApi.json();
-      console.log(testApiData.token);
+      refreshToken = testApiData.refreshToken;
+      console.log(testApiData.token, refreshToken);
 
-      const protectedApi = await fetch(
-        'http://localhost:3000/protected/10/1000',
-        {
-          headers: {
-            Authorization: `Bearer ${testApiData.token}`,
-          },
-        }
-      );
+      fetchData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  postData();
+
+  const fetchData = async function () {
+    try {
+      const protectedApi = await fetch('http://localhost:3000/protected/10', {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      });
 
       const protectedApiData = await protectedApi.json();
       console.log(protectedApiData.message);
@@ -74,7 +71,32 @@ function App() {
     }
   };
 
-  postData();
+  // fetchData();
+
+  const logout = async function () {
+    try {
+      console.log(refreshToken);
+
+      const logoutApi = await fetch('http://localhost:3000/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken: refreshToken }),
+      });
+
+      const logoutApiRes = await logoutApi.json();
+      console.log(logoutApiRes.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  setTimeout(() => logout(), 5000);
+
+  setTimeout(() => fetchData(), 7000);
+
+  setTimeout(() => fetchData(), 12000);
 
   return (
     <div className="App">
