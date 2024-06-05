@@ -32,7 +32,21 @@ export default function Login() {
             value={password}
           />
         </label>
-        <button className="btn">Submit</button>
+        {error && (
+          <label>
+            <p className='login-form-error'>{error.message} </p>
+          </label>
+        )}
+        {!isPending && (
+          <button className="btn" type="submit">
+            Login
+          </button>
+        )}
+        {isPending && (
+          <button className="btn" disabled>
+            Loading
+          </button>
+        )}
       </form>
     </div>
   );

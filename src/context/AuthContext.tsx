@@ -22,7 +22,13 @@ type InitialState = {
 };
 
 const initialState: InitialState = {
-  user: { id: '1', name: 'Michal', surname: 'Salek', position: 'developer' },
+  user: {
+    id: '1',
+    name: 'Michal',
+    surname: 'Salek',
+    userName: 'mictes',
+    position: 'developer',
+  },
   authIsReady: true,
 };
 

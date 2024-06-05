@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
 import { useNavigate } from 'react-router-dom';
+import { UserSateType } from '../context/AuthContext';
 
 export function useLogin() {
   const [error, setError] = useState<Error | null>(null);
@@ -20,12 +21,23 @@ export function useLogin() {
         body: JSON.stringify({ username, password }),
       });
       if (!loginUser.ok) {
-        throw Error(loginUser.statusText);
+        throw new Error(await loginUser.json().then(data => data.message));
       }
       const loginUserData = await loginUser.json();
-      console.log(loginUserData.token, loginUserData.refreshToken);
+      dispatch({ type: UserSateType.LOGIN, payload: loginUserData.user });
+      sessionStorage.setItem('token', loginUserData.token);
+      sessionStorage.setItem('refreshToken', loginUserData.refreshToken);
+      console.log(
+        loginUserData.token,
+        loginUserData.refreshToken,
+        loginUserData.user
+      );
+      setError(null);
+      setIsPending(false);
     } catch (err: any) {
       console.error(err);
+      setError(err);
+      setIsPending(false);
     }
   };
 
