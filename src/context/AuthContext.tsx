@@ -1,4 +1,4 @@
-import { Dispatch, createContext, useReducer } from 'react';
+import { Dispatch, createContext, useEffect, useReducer } from 'react';
 import { User } from '../model/User';
 
 export enum UserSateType {
@@ -22,14 +22,8 @@ type InitialState = {
 };
 
 const initialState: InitialState = {
-  user: {
-    id: '1',
-    name: 'Michal',
-    surname: 'Salek',
-    userName: 'mictes',
-    position: 'developer',
-  },
-  authIsReady: true,
+  user: null,
+  authIsReady: false,
 };
 
 export const AuthContext = createContext<{
@@ -57,6 +51,48 @@ export const AuthContextProvider = function ({
   children,
 }: AuthContextProviderProps) {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  useEffect(() => {
+    const refreshToken = sessionStorage.getItem('refreshToken');
+    if (refreshToken !== null) {
+      const findUserByToken = async function () {
+        try {
+          console.log(refreshToken);
+
+          const loginUser = await fetch('http://localhost:3000/refreshToken', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }),
+          });
+          if (!loginUser.ok) {
+            dispatch({ type: UserSateType.AUTH_IS_READY, payload: null });
+            throw new Error(await loginUser.json().then(data => data.message));
+          }
+
+          const loginUserData = await loginUser.json();
+          sessionStorage.setItem('token', loginUserData.token);
+          sessionStorage.setItem('refreshToken', loginUserData.refreshToken);
+          console.log(
+            loginUserData.token,
+            loginUserData.refreshToken,
+            loginUserData.user
+          );
+
+          // if (user) {
+          //   dispatch({ type: UserSateType.AUTH_IS_READY, payload: user });
+          // }
+        } catch (err: any) {
+          console.error(err.message);
+        }
+      };
+
+      findUserByToken();
+    } else {
+      dispatch({ type: UserSateType.AUTH_IS_READY, payload: null });
+    }
+  }, []);
 
   console.log(state);
   return (

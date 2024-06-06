@@ -27,13 +27,10 @@ export function useLogin() {
       dispatch({ type: UserSateType.LOGIN, payload: loginUserData.user });
       sessionStorage.setItem('token', loginUserData.token);
       sessionStorage.setItem('refreshToken', loginUserData.refreshToken);
-      console.log(
-        loginUserData.token,
-        loginUserData.refreshToken,
-        loginUserData.user
-      );
+      console.log(loginUserData.refreshToken);
       setError(null);
       setIsPending(false);
+      navigate('/');
     } catch (err: any) {
       console.error(err);
       setError(err);
