@@ -51,7 +51,7 @@ export const AuthContextProvider = function ({
   children,
 }: AuthContextProviderProps) {
   const [state, dispatch] = useReducer(authReducer, initialState);
-
+  const controller = new AbortController();
   useEffect(() => {
     const refreshToken = sessionStorage.getItem('refreshToken');
     if (refreshToken !== null) {
@@ -80,9 +80,10 @@ export const AuthContextProvider = function ({
             loginUserData.user
           );
 
-          // if (user) {
-          //   dispatch({ type: UserSateType.AUTH_IS_READY, payload: user });
-          // }
+          dispatch({
+            type: UserSateType.AUTH_IS_READY,
+            payload: loginUserData.user,
+          });
         } catch (err: any) {
           console.error(err.message);
         }
