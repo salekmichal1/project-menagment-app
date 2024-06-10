@@ -51,7 +51,6 @@ export const AuthContextProvider = function ({
   children,
 }: AuthContextProviderProps) {
   const [state, dispatch] = useReducer(authReducer, initialState);
-  const controller = new AbortController();
   useEffect(() => {
     const refreshToken = sessionStorage.getItem('refreshToken');
     if (refreshToken !== null) {
@@ -68,7 +67,15 @@ export const AuthContextProvider = function ({
           });
           if (!loginUser.ok) {
             dispatch({ type: UserSateType.AUTH_IS_READY, payload: null });
-            throw new Error(await loginUser.json().then(data => data.message));
+            const errorMess = await loginUser.json().then(data => {
+              return data.message;
+            });
+            if (errorMess === 'Invalid refresh token' || 'Token not found') {
+              sessionStorage.removeItem('token');
+              sessionStorage.removeItem('refreshToken');
+            }
+
+            throw new Error(errorMess);
           }
 
           const loginUserData = await loginUser.json();

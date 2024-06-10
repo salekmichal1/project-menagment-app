@@ -3,6 +3,8 @@ import { UserStory } from '../model/UserStory';
 import { useEffect, useState } from 'react';
 import NewStoryForm from './NewStoryForm';
 import { useNavigate } from 'react-router-dom';
+import ModalForm from './ModalForm';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 export default function UserStoriesList() {
   const [userStories, setUserStories] = useState<UserStory[]>(
@@ -12,7 +14,8 @@ export default function UserStoriesList() {
   const [userStoryToEdit, setUserStoryToEdit] = useState<UserStory | null>(
     null
   );
-
+  const { state } = useAuthContext();
+  const projectId: string = localStorage.getItem('projectInWork')!;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -98,12 +101,60 @@ export default function UserStoriesList() {
         ))}
       </div>
       {showModal && (
-        <NewStoryForm
-          handleAddNewUserStory={handleAddNewUserStory}
-          handleClose={handleClose}
-          userStoryToEdit={userStoryToEdit}
-          setUserStoryToEdit={setUserStoryToEdit}
-          handleEditUserStory={handleEditUserStory}
+        <ModalForm
+          fields={[
+            {
+              name: 'name',
+              label: 'Userstory name',
+              initialValue: userStoryToEdit ? userStoryToEdit.name : '',
+            },
+            {
+              name: 'description',
+              label: 'Userstory description',
+              initialValue: userStoryToEdit ? userStoryToEdit.description : '',
+            },
+            {
+              name: 'priority',
+              label: 'Userstory priority',
+              initialValue: userStoryToEdit ? userStoryToEdit.priority : '',
+            },
+            {
+              name: 'state',
+              label: 'Userstory state',
+              initialValue: userStoryToEdit ? userStoryToEdit.state : '',
+            },
+          ]}
+          onSubmit={values => {
+            if (userStoryToEdit === null) {
+              const id = crypto.randomUUID();
+              const userStory: UserStory = {
+                id: id,
+                name: values.name,
+                description: values.description,
+                priority: '',
+                projectId: projectId,
+                createDate: new Date(),
+                state: 'Todo',
+                createdBy: `${state.user?.name} ${state.user?.surname}`,
+              };
+              handleAddNewUserStory(userStory);
+            }
+
+            if (userStoryToEdit !== null) {
+              const editedUserStory: UserStory = {
+                id: userStoryToEdit.id,
+                name: values.title,
+                description: values.description,
+                priority: values.priority,
+                projectId: projectId,
+                createDate: userStoryToEdit.createDate,
+                state: values.state,
+                createdBy: userStoryToEdit.createdBy,
+              };
+              handleEditUserStory(editedUserStory);
+            }
+          }}
+          onReset={handleClose}
         />
       )}
     </div>

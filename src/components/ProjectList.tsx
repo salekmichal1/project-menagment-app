@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Project } from '../model/Project';
 import NewProjectForm from './NewProjectForm';
+import ModalForm from './ModalForm';
 import './ProjectList.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,6 +44,7 @@ export default function ProjectList() {
   const handleClose = () => {
     setShowModal(false);
     setProjectToEdit(null);
+    console.log(projectToEdit);
   };
 
   const handleSelectProject = function (id: string) {
@@ -51,10 +53,10 @@ export default function ProjectList() {
   };
 
   const handleDelete = function (id: string) {
-    if(id === localStorage.getItem('projectInWork')){
-      localStorage.setItem('projectInWork', '')
+    if (id === localStorage.getItem('projectInWork')) {
+      localStorage.setItem('projectInWork', '');
     }
-    
+
     setProjects(prevProjects => {
       return prevProjects.filter(project => {
         return id !== project.id;
@@ -101,12 +103,47 @@ export default function ProjectList() {
         ))}
       </div>
       {showModal && (
-        <NewProjectForm
-          addNewProject={handleAddNewProject}
-          handleClose={handleClose}
-          projectToEdit={projectToEdit}
-          editProject={handleEditProject}
-          setProjectToEdit={setProjectToEdit}
+        // <NewProjectForm
+        //   addNewProject={handleAddNewProject}
+        //   handleClose={handleClose}
+        //   projectToEdit={projectToEdit}
+        //   editProject={handleEditProject}
+        //   setProjectToEdit={setProjectToEdit}
+        // />
+        <ModalForm
+          fields={[
+            {
+              name: 'title',
+              label: 'Project title',
+              initialValue: projectToEdit ? projectToEdit.title : '',
+            },
+            {
+              name: 'description',
+              label: 'Project description',
+              initialValue: projectToEdit ? projectToEdit.description : '',
+            },
+          ]}
+          onSubmit={values => {
+            if (projectToEdit === null) {
+              const id = crypto.randomUUID();
+              const project: Project = {
+                id: id,
+                title: values.title,
+                description: values.description,
+              };
+              handleAddNewProject(project);
+            }
+
+            if (projectToEdit !== null) {
+              const editedProject: Project = {
+                id: projectToEdit.id,
+                title: values.title,
+                description: values.description,
+              };
+              handleEditProject(editedProject);
+            }
+          }}
+          onReset={handleClose}
         />
       )}
     </div>

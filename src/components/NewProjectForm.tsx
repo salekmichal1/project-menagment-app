@@ -7,7 +7,7 @@ interface FuncProps {
   handleClose(): void;
   projectToEdit: Project | null;
   editProject(editedProject: Project): void;
-  setProjectToEdit:  React.Dispatch<React.SetStateAction<Project | null>>;
+  setProjectToEdit: React.Dispatch<React.SetStateAction<Project | null>>;
 }
 
 export default function NewProjectForm({
@@ -17,7 +17,6 @@ export default function NewProjectForm({
   editProject,
   setProjectToEdit,
 }: FuncProps) {
-
   const [title, setTitle] = useState<string>(
     projectToEdit === null ? '' : projectToEdit.title
   );
@@ -81,8 +80,10 @@ export default function NewProjectForm({
           />
         </label>
 
-        <button className="btn">Submit</button>
-        <button type="submit" className="btn" onClick={handleClose}>
+        <button type="submit" className="btn">
+          Submit
+        </button>
+        <button className="btn" onClick={handleClose}>
           Close
         </button>
       </form>
