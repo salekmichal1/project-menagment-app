@@ -107,21 +107,35 @@ export default function UserStoriesList() {
               name: 'name',
               label: 'Userstory name',
               initialValue: userStoryToEdit ? userStoryToEdit.name : '',
+              type: 'text',
             },
             {
               name: 'description',
               label: 'Userstory description',
               initialValue: userStoryToEdit ? userStoryToEdit.description : '',
+              type: 'text',
             },
             {
               name: 'priority',
               label: 'Userstory priority',
               initialValue: userStoryToEdit ? userStoryToEdit.priority : '',
+              type: 'select',
+              options: [
+                { value: 'Low', label: 'Low' },
+                { value: 'Medium', label: 'Medium' },
+                { value: 'High', label: 'High' },
+              ],
             },
             {
               name: 'state',
               label: 'Userstory state',
               initialValue: userStoryToEdit ? userStoryToEdit.state : '',
+              type: 'select',
+              options: [
+                { value: 'Todo', label: 'Todo' },
+                { value: 'In progress', label: 'In progress' },
+                { value: 'Done', label: 'Done' },
+              ],
             },
           ]}
           onSubmit={values => {

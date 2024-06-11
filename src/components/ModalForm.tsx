@@ -6,6 +6,8 @@ interface FieldConfig {
   name: string;
   label: string;
   initialValue: string;
+  type: 'text' | 'select';
+  options?: { value: string; label: string }[];
 }
 
 interface FormProps {
@@ -30,7 +32,12 @@ export default function UniversalForm({
   }, [fields]);
 
   const handleChange =
-    (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (name: string) =>
+    (
+      event:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.ChangeEvent<HTMLSelectElement>
+    ) => {
       setValues(prevValues => ({ ...prevValues, [name]: event.target.value }));
     };
 
@@ -49,16 +56,35 @@ export default function UniversalForm({
         className="modal-form"
         onSubmit={handleSubmit}
         onReset={handleReset}>
-        {fields.map(field => (
-          <div key={field.name}>
-            <label>{field.label}</label>
-            <input
-              type="text"
-              value={values[field.name] || ''}
-              onChange={handleChange(field.name)}
-            />
-          </div>
-        ))}
+        {fields.map(field => {
+          if (field.type === 'select') {
+            return (
+              <div key={field.name}>
+                <label>{field.label}:</label>
+                <select
+                  value={values[field.name] || ''}
+                  onChange={handleChange(field.name)}>
+                  {field.options?.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            );
+          } else {
+            return (
+              <div key={field.name}>
+                <label>{field.label}:</label>
+                <input
+                  type="text"
+                  value={values[field.name] || ''}
+                  onChange={handleChange(field.name)}
+                />
+              </div>
+            );
+          }
+        })}
         <button className="btn" type="submit">
           Submit
         </button>

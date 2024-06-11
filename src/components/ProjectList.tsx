@@ -116,11 +116,13 @@ export default function ProjectList() {
               name: 'title',
               label: 'Project title',
               initialValue: projectToEdit ? projectToEdit.title : '',
+              type: 'text',
             },
             {
               name: 'description',
               label: 'Project description',
               initialValue: projectToEdit ? projectToEdit.description : '',
+              type: 'text',
             },
           ]}
           onSubmit={values => {
