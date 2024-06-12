@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './Login.css';
-import { useLogin } from '../hooks/useLogin';
+import { useLogin } from '../../hooks/useLogin';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
@@ -34,7 +34,7 @@ export default function Login() {
         </label>
         {error && (
           <label>
-            <p className='login-form-error'>{error.message} </p>
+            <p className="login-form-error">{error.message} </p>
           </label>
         )}
         {!isPending && (

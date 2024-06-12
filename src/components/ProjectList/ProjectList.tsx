@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Project } from '../model/Project';
-import NewProjectForm from './NewProjectForm';
-import ModalForm from './ModalForm';
+import { Project } from '../../model/Project';
+import ModalForm from '../ModalForm/ModalForm';
 import './ProjectList.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -103,13 +102,6 @@ export default function ProjectList() {
         ))}
       </div>
       {showModal && (
-        // <NewProjectForm
-        //   addNewProject={handleAddNewProject}
-        //   handleClose={handleClose}
-        //   projectToEdit={projectToEdit}
-        //   editProject={handleEditProject}
-        //   setProjectToEdit={setProjectToEdit}
-        // />
         <ModalForm
           fields={[
             {

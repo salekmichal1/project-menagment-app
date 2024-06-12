@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Projects from './pages/Projects';
-import Tasks from './pages/Tasks';
-import Login from './pages/Login';
+import Navbar from './components/Navbar/Navbar';
+import Home from './pages/Home/Home';
+import Projects from './pages/Projects/Projects';
+import Tasks from './pages/Tasks/Tasks';
+import Login from './pages/Login/Login';
 
 function App() {
   if (

@@ -1,10 +1,9 @@
 import './UserStoriesList.css';
-import { UserStory } from '../model/UserStory';
+import { UserStory } from '../../model/UserStory';
 import { useEffect, useState } from 'react';
-import NewStoryForm from './NewStoryForm';
 import { useNavigate } from 'react-router-dom';
-import ModalForm from './ModalForm';
-import { useAuthContext } from '../hooks/useAuthContext';
+import ModalForm from '../ModalForm/ModalForm';
+import { useAuthContext } from '../../hooks/useAuthContext';
 
 export default function UserStoriesList() {
   const [userStories, setUserStories] = useState<UserStory[]>(

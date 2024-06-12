@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './Home.css';
 import { useNavigate } from 'react-router-dom';
-import { Project } from '../model/Project';
-import UserStoriesList from '../components/UserStoriesList';
+import { Project } from '../../model/Project';
+import UserStoriesList from '../../components/UserStoriesList/UserStoriesList';
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>(
     JSON.parse(localStorage.getItem('projects') || '[]')
@@ -18,7 +18,7 @@ export default function Home() {
       navigate('/projects');
     }
   }, [navigate, selectedProject]);
-  
+
   return (
     <div>
       <h2>Selected project</h2>
