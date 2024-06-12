@@ -4,6 +4,7 @@ import { Task } from '../../model/Task';
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { projectDatabase } from '../../firebase/config';
+import TaskList from '../../components/TasksList/TaskList';
 
 export default function Tasks() {
   const { storyId } = useParams();
@@ -53,13 +54,8 @@ export default function Tasks() {
     <div>
       <h2>Tasks</h2>
       <p>User story id: {storyId}</p>
-
-      {/* {filterTasks.map((task, index) => (
-        <div key={index}>
-          <p>{task.name}</p>
-          <p>{task.description}</p>
-        </div>
-      ))} */}
+      {isPending && <div>Loading...</div>}
+      {!isPending && data && <TaskList data={data} />}
     </div>
   );
 }
