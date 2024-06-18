@@ -3,7 +3,7 @@ export type Task = {
   description: string;
   priority: string; // low/med/hig
   userStoryId: string;
-  expectedEndDate: Date;
+  expectedEndDate: any;
   createDate: Date;
   startDate: Date;
   endDate: Date;
