@@ -44,6 +44,8 @@ export default function ProjectList() {
   };
 
   const handleEditProject = function (editedProject: Project): void {
+    console.log(data);
+
     editData('Projects', editedProject.id, editedProject);
     setShowModal(false);
   };

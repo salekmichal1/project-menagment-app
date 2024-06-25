@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { projectDatabase } from '../firebase/config';
 
 export function useAddData() {
@@ -9,12 +9,15 @@ export function useAddData() {
   const addData = async (collectionName: string, data: any) => {
     setIsPending(true);
     setError(null);
+    console.log(data);
 
     try {
-      const docRef = await addDoc(
-        collection(projectDatabase, collectionName),
-        data
-      );
+      const docRef = doc(collection(projectDatabase, collectionName));
+
+      const dataWithId = { ...data, id: docRef.id };
+
+      // Set the data on this document, including the auto-generated ID
+      await setDoc(docRef, dataWithId);
       setIsPending(false);
       return docRef.id;
     } catch (error: any) {
