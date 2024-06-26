@@ -25,35 +25,18 @@ export default function ProjectList() {
     isPending: deletePending,
   } = useDeleteData();
 
-  // const [projects, setProjects] = useState<Project[]>(data);
-
   const navigate = useNavigate();
-  // console.log(projects);
-
-  // useEffect(() => {
-  //   setProjects(data);
-  // }, [data]);
-
-  const handleAddNewProject = function (newProject: Project): void {
-    addData('Projects', newProject);
-    // setProjects(prevProjects => {
-    //   return [...prevProjects, newProject];
-    // });
-
-    setShowModal(false);
-  };
 
   const handleEditProject = function (editedProject: Project): void {
     console.log(data);
 
     editData('Projects', editedProject.id, editedProject);
-    setShowModal(false);
+    handleClose();
   };
 
   const handleClose = () => {
     setShowModal(false);
     setProjectToEdit(null);
-    console.log(projectToEdit);
   };
 
   const handleSelectProject = function (id: string) {
@@ -63,12 +46,6 @@ export default function ProjectList() {
 
   const handleDelete = function (id: string) {
     deleteData('Projects', id);
-
-    // setProjects(prevProjects => {
-    //   return prevProjects.filter(project => {
-    //     return id !== project.id;
-    //   });
-    // });
   };
 
   return (
@@ -129,20 +106,11 @@ export default function ProjectList() {
           ]}
           onSubmit={values => {
             if (projectToEdit === null) {
-              // const project: Project = {
-              //   title: values.title,
-              //   description: values.description,
-              // };
-              // handleAddNewProject(project);
-
               // adding here because we don't have the id of the project at this point
               addData('Projects', {
                 title: values.title,
                 description: values.description,
               });
-              // setProjects(prevProjects => {
-              //   return [...prevProjects, newProject];
-              // });
 
               setShowModal(false);
             }

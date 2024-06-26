@@ -4,7 +4,7 @@ export type UserStory = {
   description: string;
   priority: string;
   projectId: string;
-  createDate: Date;
+  createDate: any;
   state: string; // todo/doing/done
   createdBy: string; // id użytkownika
 };

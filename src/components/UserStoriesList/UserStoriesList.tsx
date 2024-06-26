@@ -4,57 +4,47 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModalForm from '../ModalForm/ModalForm';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { useFetchData } from '../../hooks/useFetchData';
+import { useAddData } from '../../hooks/useAddData';
+import { useEditData } from '../../hooks/useEditData';
+import { useDeleteData } from '../../hooks/useDeleteData';
 
 export default function UserStoriesList() {
-  const [userStories, setUserStories] = useState<UserStory[]>(
-    JSON.parse(localStorage.getItem('userStories') || '[]')
-  );
+  const { state } = useAuthContext();
+
+  const {
+    data,
+    error: fetchErr,
+    isPending: fetchPending,
+  } = useFetchData<UserStory>('UserStories');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [userStoryToEdit, setUserStoryToEdit] = useState<UserStory | null>(
     null
   );
-  const { state } = useAuthContext();
+  const { addData, error: addErr, isPending: addPending } = useAddData();
+  const { editData, error: editErr, isPending: editPending } = useEditData();
+  const {
+    deleteData,
+    error: deleteErr,
+    isPending: deletePending,
+  } = useDeleteData();
+
   const projectId: string = localStorage.getItem('projectInWork')!;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    localStorage.setItem('userStories', JSON.stringify(userStories));
-  }, [userStories]);
-
-  const handleAddNewUserStory = function (newStory: UserStory): void {
-    setUserStories(prevStory => {
-      return [...prevStory, newStory];
-    });
-
-    setShowModal(false);
-  };
-
   const handleEditUserStory = function (editedUserStory: UserStory): void {
-    const targetIndex = userStories.findIndex(
-      userStory => userStory.id === editedUserStory.id
-    );
+    editData('UserStories', editedUserStory.id, editedUserStory);
 
-    const editedArray = [
-      ...userStories.slice(0, targetIndex),
-      editedUserStory,
-      ...userStories.slice(targetIndex + 1),
-    ];
-
-    setUserStories(editedArray);
-    setShowModal(false);
-  };
-
-  const handleDelete = function (id: string) {
-    setUserStories(prevStory => {
-      return prevStory.filter(story => {
-        return id !== story.id;
-      });
-    });
+    handleClose();
   };
 
   const handleClose = () => {
     setShowModal(false);
     setUserStoryToEdit(null);
+  };
+
+  const handleDelete = function (id: string) {
+    deleteData('UserStories', id);
   };
 
   return (
@@ -66,38 +56,41 @@ export default function UserStoriesList() {
         Add new user story
       </button>
       <div className="user-stories-list__list">
-        {userStories.map(story => (
-          <div key={story.id} className="user-stories-list__story">
-            <h2>{story.name}</h2>
-            <p>{story.description}</p>
-            <p>{story.createdBy}</p>
-            <button
-              className="btn"
-              onClick={() => {
-                setShowModal(true);
-                setUserStoryToEdit({
-                  id: story.id,
-                  name: story.name,
-                  description: story.description,
-                  priority: story.priority,
-                  projectId: story.projectId,
-                  createDate: story.createDate,
-                  state: story.state,
-                  createdBy: story.createdBy,
-                });
-              }}>
-              Edit
-            </button>
-            <button
-              className="btn"
-              onClick={() => navigate(`/tasks/${story.id}`)}>
-              Select
-            </button>
-            <button className="btn" onClick={() => handleDelete(story.id)}>
-              Delete
-            </button>
-          </div>
-        ))}
+        {fetchPending && <p>Loading...</p>}
+        {!fetchPending &&
+          data.map(story => (
+            <div key={story.id} className="user-stories-list__story">
+              <h2>{story.name}</h2>
+              <p>{story.description}</p>
+              <p>{story.createdBy}</p>
+              <p>{story.createDate.toDate().toLocaleDateString()}</p>
+              <button
+                className="btn"
+                onClick={() => {
+                  setShowModal(true);
+                  setUserStoryToEdit({
+                    id: story.id,
+                    name: story.name,
+                    description: story.description,
+                    priority: story.priority,
+                    projectId: story.projectId,
+                    createDate: story.createDate,
+                    state: story.state,
+                    createdBy: story.createdBy,
+                  });
+                }}>
+                Edit
+              </button>
+              <button
+                className="btn"
+                onClick={() => navigate(`/tasks/${story.id}`)}>
+                Select
+              </button>
+              <button className="btn" onClick={() => handleDelete(story.id)}>
+                Delete
+              </button>
+            </div>
+          ))}
       </div>
       {showModal && (
         <ModalForm
@@ -139,9 +132,7 @@ export default function UserStoriesList() {
           ]}
           onSubmit={values => {
             if (userStoryToEdit === null) {
-              const id = crypto.randomUUID();
-              const userStory: UserStory = {
-                id: id,
+              addData('UserStories', {
                 name: values.name,
                 description: values.description,
                 priority: '',
@@ -149,14 +140,14 @@ export default function UserStoriesList() {
                 createDate: new Date(),
                 state: 'Todo',
                 createdBy: `${state.user?.name} ${state.user?.surname}`,
-              };
-              handleAddNewUserStory(userStory);
+              });
+              setShowModal(false);
             }
 
             if (userStoryToEdit !== null) {
               const editedUserStory: UserStory = {
                 id: userStoryToEdit.id,
-                name: values.title,
+                name: values.name,
                 description: values.description,
                 priority: values.priority,
                 projectId: projectId,
