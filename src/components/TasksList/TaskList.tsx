@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Task } from '../../model/Task';
 import './TaskList.css';
+import ModalForm from '../ModalForm/ModalForm';
 import {
   Table,
   TableBody,
@@ -26,10 +27,16 @@ import { visuallyHidden } from '@mui/utils';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import { useAddData } from '../../hooks/useAddData';
+import { useEditData } from '../../hooks/useEditData';
+import { useDeleteData } from '../../hooks/useDeleteData';
+import { useAuthContext } from '../../hooks/useAuthContext';
 
 interface TaskListProps {
   data: Task[];
+  userStoryId: string;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -56,25 +63,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map(el => el[0]);
-}
-
 function Row(props: {
   row: Task;
   isSelected: (id: string) => boolean;
@@ -91,15 +79,16 @@ function Row(props: {
     <React.Fragment>
       <TableRow
         hover
-        onClick={event => handleClick(event, row.id)}
         role="checkbox"
         aria-checked={isItemSelected}
         tabIndex={-1}
         key={row.id}
-        selected={isItemSelected}
-        sx={{ cursor: 'pointer' }}>
+        selected={isItemSelected}>
         <TableCell padding="checkbox">
           <Checkbox
+            onClick={event => {
+              handleClick(event, row.id);
+            }}
             color="primary"
             checked={isItemSelected}
             inputProps={{
@@ -154,8 +143,206 @@ function Row(props: {
   );
 }
 
-export default function TaskList({ data }: TaskListProps) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+interface HeadCell {
+  disablePadding: boolean;
+  id: keyof Task;
+  label: string;
+  numeric: boolean;
+}
+
+const headCells: readonly HeadCell[] = [
+  {
+    id: 'name',
+    numeric: false,
+    disablePadding: true,
+    label: 'Name',
+  },
+  {
+    id: 'priority',
+    numeric: false,
+    disablePadding: false,
+    label: 'Priority',
+  },
+  {
+    id: 'expectedEndDate',
+    numeric: true,
+    disablePadding: false,
+    label: 'Expected End Date',
+  },
+  {
+    id: 'createDate',
+    numeric: true,
+    disablePadding: false,
+    label: 'Create Date',
+  },
+  {
+    id: 'startDate',
+    numeric: true,
+    disablePadding: false,
+    label: 'Start Date',
+  },
+  {
+    id: 'endDate',
+    numeric: true,
+    disablePadding: false,
+    label: 'End Date',
+  },
+  {
+    id: 'state',
+    numeric: false,
+    disablePadding: false,
+    label: 'State',
+  },
+  {
+    id: 'pinedUser',
+    numeric: false,
+    disablePadding: false,
+    label: 'Pined User',
+  },
+];
+
+interface EnhancedTableProps {
+  numSelected: number;
+  onRequestSort: (
+    event: React.MouseEvent<unknown>,
+    property: keyof Task
+  ) => void;
+  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  order: Order;
+  orderBy: string;
+  rowCount: number;
+}
+
+function EnhancedTableHead(props: EnhancedTableProps) {
+  const {
+    onSelectAllClick,
+    order,
+    orderBy,
+    numSelected,
+    rowCount,
+    onRequestSort,
+  } = props;
+  const createSortHandler =
+    (property: keyof Task) => (event: React.MouseEvent<unknown>) => {
+      onRequestSort(event, property);
+    };
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            color="primary"
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{
+              'aria-label': 'select all desserts',
+            }}
+          />
+        </TableCell>
+        <TableCell />
+        {headCells.map(headCell => (
+          <TableCell
+            key={headCell.id}
+            // align={headCell.numeric ? 'right' : 'left'}
+            // padding={headCell.disablePadding ? 'none' : 'normal'}
+            sortDirection={orderBy === headCell.id ? order : false}>
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}>
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+interface EnhancedTableToolbarProps {
+  numSelected: number;
+  handleAdd: () => void;
+  handleEdit: (task: Task) => void;
+  hamdleDelete: () => void;
+  setShowModal: (showModal: boolean) => void;
+}
+
+function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
+  const { numSelected, handleAdd, handleEdit, hamdleDelete, setShowModal } =
+    props;
+
+  return (
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
+          bgcolor: theme =>
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity
+            ),
+        }),
+      }}>
+      {numSelected > 0 ? (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          color="inherit"
+          variant="subtitle1"
+          component="div">
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography
+          sx={{ flex: '1 1 100%' }}
+          variant="h6"
+          id="tableTitle"
+          component="div">
+          Nutrition
+        </Typography>
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton onClick={hamdleDelete}>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <>
+          <Tooltip title="Add">
+            <IconButton onClick={() => setShowModal(true)}>
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit">
+            <IconButton>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        </>
+      )}
+    </Toolbar>
+  );
+}
+
+export default function TaskList({ data, userStoryId }: TaskListProps) {
+  const { state } = useAuthContext();
+  const { addData, error: addErr, isPending: addPending } = useAddData();
+  const { editData, error: editErr, isPending: editPending } = useEditData();
+  const {
+    deleteData,
+    error: deleteErr,
+    isPending: deletePending,
+  } = useDeleteData();
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = useState<keyof Task>('id');
 
@@ -164,7 +351,7 @@ export default function TaskList({ data }: TaskListProps) {
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // State for row selection
-  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const handleEdit = (task: Task) => {
     // setSelectedTask(task);
@@ -174,9 +361,18 @@ export default function TaskList({ data }: TaskListProps) {
     // Add logic to add a new task
   };
 
-  useEffect(() => {
-    setTasks(data);
-  }, [data]);
+  const handleDelete = () => {
+    //
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    // setProjectToEdit(null);
+  };
+
+  // useEffect(() => {
+  //   setTasks(data);
+  // }, [data]);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -197,7 +393,7 @@ export default function TaskList({ data }: TaskListProps) {
   };
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = tasks.map(n => n.id);
+      const newSelected = data.map(n => n.id);
       setSelected(newSelected);
       return;
     }
@@ -205,7 +401,7 @@ export default function TaskList({ data }: TaskListProps) {
   };
   const handleClick = (event: React.MouseEvent<unknown>, id: string) => {
     const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly string[] = [];
+    let newSelected: string[] = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
@@ -226,227 +422,153 @@ export default function TaskList({ data }: TaskListProps) {
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - tasks.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
-  const visibleRows = React.useMemo(
+  const visibleRows = useMemo(
     () =>
-      stableSort(tasks, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
+      // stableSort(tasks, getComparator(order, orderBy)).slice(
+      //   page * rowsPerPage,
+      //   page * rowsPerPage + rowsPerPage
+      // ),
+      data.slice().sort(getComparator(order, orderBy)),
     [order, orderBy, page, rowsPerPage]
   );
 
-  interface HeadCell {
-    disablePadding: boolean;
-    id: keyof Task;
-    label: string;
-    numeric: boolean;
-  }
-
-  const headCells: readonly HeadCell[] = [
-    {
-      id: 'name',
-      numeric: false,
-      disablePadding: true,
-      label: 'Name',
-    },
-    {
-      id: 'priority',
-      numeric: true,
-      disablePadding: false,
-      label: 'Priority',
-    },
-    {
-      id: 'expectedEndDate',
-      numeric: true,
-      disablePadding: false,
-      label: 'Expected End Date',
-    },
-    {
-      id: 'createDate',
-      numeric: true,
-      disablePadding: false,
-      label: 'Create Date',
-    },
-    {
-      id: 'startDate',
-      numeric: true,
-      disablePadding: false,
-      label: 'Start Date',
-    },
-    {
-      id: 'endDate',
-      numeric: true,
-      disablePadding: false,
-      label: 'End Date',
-    },
-    {
-      id: 'state',
-      numeric: true,
-      disablePadding: false,
-      label: 'State',
-    },
-  ];
-
-  interface EnhancedTableProps {
-    numSelected: number;
-    onRequestSort: (
-      event: React.MouseEvent<unknown>,
-      property: keyof Task
-    ) => void;
-    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    order: Order;
-    orderBy: string;
-    rowCount: number;
-  }
-
-  function EnhancedTableHead(props: EnhancedTableProps) {
-    const {
-      onSelectAllClick,
-      order,
-      orderBy,
-      numSelected,
-      rowCount,
-      onRequestSort,
-    } = props;
-    const createSortHandler =
-      (property: keyof Task) => (event: React.MouseEvent<unknown>) => {
-        onRequestSort(event, property);
-      };
-
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell padding="checkbox">
-            <Checkbox
-              color="primary"
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={rowCount > 0 && numSelected === rowCount}
-              onChange={onSelectAllClick}
-              inputProps={{
-                'aria-label': 'select all desserts',
-              }}
-            />
-          </TableCell>
-          {headCells.map(headCell => (
-            <TableCell
-              key={headCell.id}
-              align={headCell.numeric ? 'right' : 'left'}
-              padding={headCell.disablePadding ? 'none' : 'normal'}
-              sortDirection={orderBy === headCell.id ? order : false}>
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={createSortHandler(headCell.id)}>
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc'
-                      ? 'sorted descending'
-                      : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-    );
-  }
-
-  interface EnhancedTableToolbarProps {
-    numSelected: number;
-  }
-
-  function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected } = props;
-
-    return (
-      <Toolbar
-        sx={{
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
-          ...(numSelected > 0 && {
-            bgcolor: theme =>
-              alpha(
-                theme.palette.primary.main,
-                theme.palette.action.activatedOpacity
-              ),
-          }),
-        }}>
-        {numSelected > 0 ? (
-          <Typography
-            sx={{ flex: '1 1 100%' }}
-            color="inherit"
-            variant="subtitle1"
-            component="div">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography
-            sx={{ flex: '1 1 100%' }}
-            variant="h6"
-            id="tableTitle"
-            component="div">
-            Nutrition
-          </Typography>
-        )}
-        {numSelected > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Toolbar>
-    );
-  }
-
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+    <div>
+      <Box sx={{ width: '100%' }}>
+        <Paper sx={{ width: '100%', mb: 2 }}>
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            handleAdd={handleAdd}
+            handleEdit={handleEdit}
+            hamdleDelete={handleDelete}
+            setShowModal={setShowModal}
+          />
 
-        <TableContainer component={Paper}>
-          <Table aria-label="collapsible table" sx={{ minWidth: 750 }}>
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={tasks.length}
-            />
-            <TableBody>
-              {tasks.map((task, index) => (
-                <Row
-                  key={index}
-                  row={task}
-                  isSelected={isSelected}
-                  index={index}
-                  handleClick={handleClick}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={tasks.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          <TableContainer component={Paper}>
+            <Table aria-label="collapsible table" sx={{ minWidth: 750 }}>
+              <EnhancedTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={data.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => (
+                  <Row
+                    key={index}
+                    row={row}
+                    isSelected={isSelected}
+                    index={index}
+                    handleClick={handleClick}
+                  />
+                ))}
+                {emptyRows > 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </Box>
+      {showModal && (
+        <ModalForm
+          fields={[
+            {
+              name: 'name',
+              label: 'Task name',
+              initialValue: '',
+              type: 'text',
+            },
+            {
+              name: 'description',
+              label: 'Task description',
+              initialValue: '',
+              type: 'text',
+            },
+            {
+              name: 'priority',
+              label: 'Task priority',
+              initialValue: 'Low',
+              type: 'select',
+              options: [
+                { value: 'Low', label: 'Low' },
+                { value: 'Medium', label: 'Medium' },
+                { value: 'High', label: 'High' },
+              ],
+            },
+            {
+              name: 'expectedEndDate',
+              label: 'Expected End Date',
+              initialValue: new Date().toISOString(),
+              type: 'date',
+            },
+            {
+              name: 'startDate',
+              label: 'Expected Start Date',
+              initialValue: new Date().toISOString(),
+              type: 'date',
+            },
+            {
+              name: 'state',
+              label: 'Userstory state',
+              initialValue: 'Todo',
+              type: 'select',
+              options: [
+                { value: 'Todo', label: 'Todo' },
+                { value: 'In progress', label: 'In progress' },
+                { value: 'Done', label: 'Done' },
+              ],
+            },
+          ]}
+          onSubmit={values => {
+            // if (projectToEdit === null) {
+            // adding here because we don't have the id of the project at this point
+
+            addData('Tasks', {
+              name: values.name,
+              priority: values.priority,
+              expectedEndDate: new Date(values.expectedEndDate),
+              createDate: new Date(),
+              startDate: new Date(values.startDate),
+              endDate: null,
+              state: values.state,
+              description: values.description,
+              pinedUser: `${state.user?.name} ${state.user?.surname}`,
+              userStoryId: userStoryId,
+            });
+
+            setShowModal(false);
+
+            console.log(addErr);
+            // }
+
+            // if (projectToEdit !== null) {
+            //   const editedProject: Project = {
+            //     id: projectToEdit.id,
+            //     title: values.title,
+            //     description: values.description,
+            //   };
+            //   handleEditProject(editedProject);
+            // }
+          }}
+          onReset={handleClose}
         />
-      </Paper>
-    </Box>
+      )}
+    </div>
   );
 }

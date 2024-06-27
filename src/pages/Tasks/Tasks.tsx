@@ -47,15 +47,14 @@ export default function Tasks() {
   // const filterTasks = tasks.filter(task => task.userStoryId === storyId);
 
   // console.log(filterTasks);
-
-  console.log(data);
-
   return (
     <div>
       <h2>Tasks</h2>
       <p>User story id: {storyId}</p>
       {isPending && <div>Loading...</div>}
-      {!isPending && data && <TaskList data={data} />}
+      {!isPending && data && storyId && (
+        <TaskList data={data} userStoryId={storyId} />
+      )}
     </div>
   );
 }

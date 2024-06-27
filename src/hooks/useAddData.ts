@@ -23,6 +23,7 @@ export function useAddData() {
     } catch (error: any) {
       setError(error);
       setIsPending(false);
+      console.log(error.message);
     }
   };
   return { error, isPending, addData };

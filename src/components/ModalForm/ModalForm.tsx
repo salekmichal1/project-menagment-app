@@ -1,18 +1,23 @@
 import './ModalForm.css';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface FieldConfig {
-  name: string;
+  name: any;
   label: string;
   initialValue: string;
-  type: 'text' | 'select';
+  type: 'text' | 'select' | 'date';
   options?: { value: string; label: string }[];
 }
 
 interface FormProps {
   fields: FieldConfig[];
-  onSubmit: (values: { [key: string]: string }) => void;
+  onSubmit: (values: { [key: string]: any }) => void;
   onReset: () => void;
 }
 
@@ -21,28 +26,41 @@ export default function UniversalForm({
   onSubmit,
   onReset,
 }: FormProps) {
-  const [values, setValues] = useState<{ [key: string]: string }>({});
+  const [values, setValues] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
     const initialValues = fields.reduce((acc, field) => {
       acc[field.name] = field.initialValue;
       return acc;
-    }, {} as { [key: string]: string });
+    }, {} as { [key: string]: any });
     setValues(initialValues);
   }, [fields]);
 
-  const handleChange =
-    (name: string) =>
-    (
-      event:
-        | React.ChangeEvent<HTMLInputElement>
-        | React.ChangeEvent<HTMLSelectElement>
-    ) => {
-      setValues(prevValues => ({ ...prevValues, [name]: event.target.value }));
+  // const handleChange =
+  //   (name: string) =>
+  //   (
+  //     event:
+  //       | React.ChangeEvent<HTMLInputElement>
+  //       | React.ChangeEvent<HTMLSelectElement>
+  //   ) => {
+  //     setValues(prevValues => ({ ...prevValues, [name]: event.target.value }));
+  //   };
+
+  function handleChange(fieldName: any) {
+    return (event: any, newValue?: any) => {
+      const value = newValue || event.target.value;
+
+      setValues(prevValues => ({
+        ...prevValues,
+        [fieldName]: value,
+      }));
     };
+  }
 
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    console.log(values);
+
     onSubmit(values);
   };
 
@@ -60,7 +78,7 @@ export default function UniversalForm({
           if (field.type === 'select') {
             return (
               <div key={field.name}>
-                <label>{field.label}:</label>
+                <label className="modal-form__label">{field.label}:</label>
                 <select
                   value={values[field.name] || ''}
                   onChange={handleChange(field.name)}>
@@ -72,15 +90,37 @@ export default function UniversalForm({
                 </select>
               </div>
             );
-          } else {
+          }
+          if (field.type === 'text') {
             return (
               <div key={field.name}>
-                <label>{field.label}:</label>
+                <label className="modal-form__label">{field.label}:</label>
                 <input
+                  className="modal-form__input"
                   type="text"
                   value={values[field.name] || ''}
                   onChange={handleChange(field.name)}
                 />
+              </div>
+            );
+          }
+
+          if (field.type === 'date') {
+            return (
+              <div key={field.name}>
+                <label className="modal-form__label">{field.label}:</label>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['DatePicker']}>
+                    <DatePicker
+                      label="Pick date"
+                      value={
+                        values[field.name] ? dayjs(values[field.name]) : null
+                      }
+                      onChange={handleChange(field.name)}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
               </div>
             );
           }

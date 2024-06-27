@@ -58,39 +58,42 @@ export default function UserStoriesList() {
       <div className="user-stories-list__list">
         {fetchPending && <p>Loading...</p>}
         {!fetchPending &&
-          data.map(story => (
-            <div key={story.id} className="user-stories-list__story">
-              <h2>{story.name}</h2>
-              <p>{story.description}</p>
-              <p>{story.createdBy}</p>
-              <p>{story.createDate.toDate().toLocaleDateString()}</p>
-              <button
-                className="btn"
-                onClick={() => {
-                  setShowModal(true);
-                  setUserStoryToEdit({
-                    id: story.id,
-                    name: story.name,
-                    description: story.description,
-                    priority: story.priority,
-                    projectId: story.projectId,
-                    createDate: story.createDate,
-                    state: story.state,
-                    createdBy: story.createdBy,
-                  });
-                }}>
-                Edit
-              </button>
-              <button
-                className="btn"
-                onClick={() => navigate(`/tasks/${story.id}`)}>
-                Select
-              </button>
-              <button className="btn" onClick={() => handleDelete(story.id)}>
-                Delete
-              </button>
-            </div>
-          ))}
+          // showing only user stories that belong to the project in work
+          data
+            .filter(story => story.projectId === projectId)
+            .map(story => (
+              <div key={story.id} className="user-stories-list__story">
+                <h2>{story.name}</h2>
+                <p>{story.description}</p>
+                <p>{story.createdBy}</p>
+                <p>{story.createDate.toDate().toLocaleDateString()}</p>
+                <button
+                  className="btn"
+                  onClick={() => {
+                    setShowModal(true);
+                    setUserStoryToEdit({
+                      id: story.id,
+                      name: story.name,
+                      description: story.description,
+                      priority: story.priority,
+                      projectId: story.projectId,
+                      createDate: story.createDate,
+                      state: story.state,
+                      createdBy: story.createdBy,
+                    });
+                  }}>
+                  Edit
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => navigate(`/tasks/${story.id}`)}>
+                  Select
+                </button>
+                <button className="btn" onClick={() => handleDelete(story.id)}>
+                  Delete
+                </button>
+              </div>
+            ))}
       </div>
       {showModal && (
         <ModalForm
