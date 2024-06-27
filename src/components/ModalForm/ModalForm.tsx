@@ -117,7 +117,9 @@ export default function UniversalForm({
                       value={
                         values[field.name] ? dayjs(values[field.name]) : null
                       }
-                      onChange={handleChange(field.name)}
+                      onChange={() => {
+                        handleChange(values[field.name]);
+                      }}
                     />
                   </DemoContainer>
                 </LocalizationProvider>

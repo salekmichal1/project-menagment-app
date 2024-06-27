@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Task } from '../../model/Task';
 import './TaskList.css';
 import ModalForm from '../ModalForm/ModalForm';
@@ -370,10 +370,6 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
     // setProjectToEdit(null);
   };
 
-  // useEffect(() => {
-  //   setTasks(data);
-  // }, [data]);
-
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
     property: keyof Task
@@ -430,8 +426,11 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
       //   page * rowsPerPage,
       //   page * rowsPerPage + rowsPerPage
       // ),
-      data.slice().sort(getComparator(order, orderBy)),
-    [order, orderBy, page, rowsPerPage]
+      data
+        .slice()
+        .sort(getComparator(order, orderBy))
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [order, orderBy, page, rowsPerPage, data]
   );
 
   return (
@@ -468,7 +467,12 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
                 ))}
                 {emptyRows > 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} />
+                    <TableCell
+                      colSpan={6}
+                      style={{
+                        height: 33 * emptyRows,
+                      }}
+                    />
                   </TableRow>
                 )}
               </TableBody>

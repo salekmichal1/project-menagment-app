@@ -399,7 +399,7 @@ export default function EnhancedTable() {
                   style={{
                     height: (dense ? 33 : 53) * emptyRows,
                   }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={10} />
                 </TableRow>
               )}
             </TableBody>
