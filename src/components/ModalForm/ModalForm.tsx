@@ -3,14 +3,14 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 import React, { useState, useEffect } from 'react';
 
 interface FieldConfig {
-  name: any;
+  name: string;
   label: string;
-  initialValue: string;
+  initialValue: string | Dayjs;
   type: 'text' | 'select' | 'date';
   options?: { value: string; label: string }[];
 }
@@ -46,15 +46,25 @@ export default function UniversalForm({
   //     setValues(prevValues => ({ ...prevValues, [name]: event.target.value }));
   //   };
 
-  function handleChange(fieldName: any) {
-    return (event: any, newValue?: any) => {
-      const value = newValue || event.target.value;
+  function handleChange(fieldName: string, newValue: any) {
+    if (newValue.target) {
+      const value = newValue.target.value;
+      setValues(prevValues => ({ ...prevValues, [fieldName]: value }));
+      return;
+    } else {
+      const value = newValue;
+      setValues(prevValues => ({ ...prevValues, [fieldName]: value }));
+      return;
+    }
+    // return (event: any, newValue?: any) => {
+    //   const value = newValue || event.target.value;
 
-      setValues(prevValues => ({
-        ...prevValues,
-        [fieldName]: value,
-      }));
-    };
+    //   setValues(prevValues => ({
+    //     ...prevValues,
+    //     [fieldName]: value,
+    //   }));
+    //   console.log(values);
+    // };
   }
 
   const handleSubmit = function (event: React.FormEvent<HTMLFormElement>) {
@@ -81,7 +91,7 @@ export default function UniversalForm({
                 <label className="modal-form__label">{field.label}:</label>
                 <select
                   value={values[field.name] || ''}
-                  onChange={handleChange(field.name)}>
+                  onChange={newValue => handleChange(field.name, newValue)}>
                   {field.options?.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -99,7 +109,7 @@ export default function UniversalForm({
                   className="modal-form__input"
                   type="text"
                   value={values[field.name] || ''}
-                  onChange={handleChange(field.name)}
+                  onChange={newValue => handleChange(field.name, newValue)}
                 />
               </div>
             );
@@ -114,11 +124,9 @@ export default function UniversalForm({
                   <DemoContainer components={['DatePicker']}>
                     <DatePicker
                       label="Pick date"
-                      value={
-                        values[field.name] ? dayjs(values[field.name]) : null
-                      }
-                      onChange={() => {
-                        handleChange(values[field.name]);
+                      value={values[field.name] || dayjs(new Date())}
+                      onChange={newValue => {
+                        handleChange(field.name, newValue);
                       }}
                     />
                   </DemoContainer>

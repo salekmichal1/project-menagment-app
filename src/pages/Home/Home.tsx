@@ -13,25 +13,35 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const findProject = async (id: string) => {
-      const docRef = doc(projectDatabase, 'Projects', id);
-      const docSnap = await getDoc(docRef);
+    const findProject = async (id: string | null) => {
+      try {
+        if (id) {
+          const docRef = doc(projectDatabase, 'Projects', id);
+          const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const projectData = docSnap.data() as Project;
-        const id = docSnap.id;
-        projectData.id = id;
-        setSelectedProject(projectData);
-      } else {
-        setSelectedProject(null);
-        navigate('/projects');
+          if (docSnap.exists()) {
+            const projectData = docSnap.data() as Project;
+            const id = docSnap.id;
+            projectData.id = id;
+            setSelectedProject(projectData);
+          } else {
+            setSelectedProject(null);
+            localStorage.setItem('projectInWork', '');
+            navigate('/projects');
+          }
+        } else {
+          setSelectedProject(null);
+          localStorage.setItem('projectInWork', '');
+          navigate('/projects');
+        }
+      } catch (err) {
+        console.error(err);
       }
     };
 
     const projectId = localStorage.getItem('projectInWork');
-    if (projectId) {
-      findProject(projectId);
-    }
+
+    findProject(projectId);
   }, [navigate]);
 
   return (

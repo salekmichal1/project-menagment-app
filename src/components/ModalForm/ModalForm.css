@@ -17,6 +17,9 @@
   padding: 20px 60px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  max-height: 90vh; /* Use 90% of the viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow: auto;
 }
 
 .modal-form__label {

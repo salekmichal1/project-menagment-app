@@ -58,6 +58,9 @@ export default function ProjectList() {
       {localStorage.getItem('projectInWork') === '' && (
         <h3>None of the projects were selected</h3>
       )}
+      {localStorage.getItem('projectInWork') === 'null' && (
+        <h3>None of the projects were selected</h3>
+      )}
       <div className="project-list__list">
         {fetchPending && <div>Loading...</div>}
         {!fetchPending &&

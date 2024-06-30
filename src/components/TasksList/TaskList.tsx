@@ -33,6 +33,7 @@ import { useAddData } from '../../hooks/useAddData';
 import { useEditData } from '../../hooks/useEditData';
 import { useDeleteData } from '../../hooks/useDeleteData';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import dayjs from 'dayjs';
 
 interface TaskListProps {
   data: Task[];
@@ -185,10 +186,10 @@ const headCells: readonly HeadCell[] = [
     label: 'Priority',
   },
   {
-    id: 'expectedEndDate',
+    id: 'startDate',
     numeric: true,
     disablePadding: false,
-    label: 'Expected End Date',
+    label: 'Start Date',
   },
   {
     id: 'createDate',
@@ -197,10 +198,10 @@ const headCells: readonly HeadCell[] = [
     label: 'Create Date',
   },
   {
-    id: 'startDate',
+    id: 'expectedEndDate',
     numeric: true,
     disablePadding: false,
-    label: 'Start Date',
+    label: 'Expected End Date',
   },
   {
     id: 'endDate',
@@ -534,16 +535,16 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
               name: 'expectedEndDate',
               label: 'Expected End Date',
               initialValue: taskToEdit
-                ? taskToEdit.expectedEndDate.toDate().toISOString()
-                : new Date().toISOString(),
+                ? dayjs(taskToEdit.expectedEndDate.toDate())
+                : dayjs(new Date()),
               type: 'date',
             },
             {
               name: 'startDate',
               label: 'Expected Start Date',
               initialValue: taskToEdit
-                ? taskToEdit.startDate.toDate().toISOString()
-                : new Date().toISOString(),
+                ? dayjs(taskToEdit.startDate.toDate())
+                : dayjs(new Date()),
               type: 'date',
             },
             {
