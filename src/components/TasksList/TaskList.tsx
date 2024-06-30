@@ -68,8 +68,9 @@ function Row(props: {
   isSelected: (id: string) => boolean;
   index: number;
   handleClick: (event: React.MouseEvent<unknown>, id: string) => void;
+  handleEdit: (task: Task) => void;
 }) {
-  const { row, isSelected, index, handleClick } = props;
+  const { row, isSelected, index, handleClick, handleEdit } = props;
   const [open, setOpen] = React.useState(false);
 
   const isItemSelected = isSelected(row.id);
@@ -102,6 +103,26 @@ function Row(props: {
             size="small"
             onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell>
+          <IconButton
+            onClick={() =>
+              handleEdit({
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                priority: row.priority,
+                startDate: row.startDate,
+                createDate: row.createDate,
+                expectedEndDate: row.expectedEndDate,
+                endDate: row.endDate,
+                state: row.state,
+                pinedUser: row.pinedUser,
+                userStoryId: row.userStoryId,
+              })
+            }>
+            <EditIcon />
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
@@ -241,7 +262,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             }}
           />
         </TableCell>
-        <TableCell />
+        <TableCell style={{ width: '34px' }} />
+        <TableCell style={{ width: '34px' }} />
         {headCells.map(headCell => (
           <TableCell
             key={headCell.id}
@@ -268,15 +290,12 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
-  handleAdd: () => void;
-  handleEdit: (task: Task) => void;
   hamdleDelete: () => void;
   setShowModal: (showModal: boolean) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, handleAdd, handleEdit, hamdleDelete, setShowModal } =
-    props;
+  const { numSelected, hamdleDelete, setShowModal } = props;
 
   return (
     <Toolbar
@@ -315,18 +334,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           </IconButton>
         </Tooltip>
       ) : (
-        <>
-          <Tooltip title="Add">
-            <IconButton onClick={() => setShowModal(true)}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Edit">
-            <IconButton>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        </>
+        <Tooltip title="Add">
+          <IconButton onClick={() => setShowModal(true)}>
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       )}
     </Toolbar>
   );
@@ -353,21 +365,25 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
   // State for row selection
   const [selected, setSelected] = useState<string[]>([]);
 
-  const handleEdit = (task: Task) => {
-    // setSelectedTask(task);
-  };
+  // State for edit project
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
-  const handleAdd = () => {
-    // Add logic to add a new task
+  const handleEdit = (task: Task) => {
+    setTaskToEdit(task);
+    setShowModal(true);
   };
 
   const handleDelete = () => {
-    //
+    console.log(selected);
+    selected.forEach(id => {
+      deleteData('Tasks', id);
+    });
+    setSelected([]);
   };
 
   const handleClose = () => {
     setShowModal(false);
-    // setProjectToEdit(null);
+    setTaskToEdit(null);
   };
 
   const handleRequestSort = (
@@ -439,8 +455,6 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
         <Paper sx={{ width: '100%', mb: 2 }}>
           <EnhancedTableToolbar
             numSelected={selected.length}
-            handleAdd={handleAdd}
-            handleEdit={handleEdit}
             hamdleDelete={handleDelete}
             setShowModal={setShowModal}
           />
@@ -463,6 +477,7 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
                     isSelected={isSelected}
                     index={index}
                     handleClick={handleClick}
+                    handleEdit={handleEdit}
                   />
                 ))}
                 {emptyRows > 0 && (
@@ -495,19 +510,19 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
             {
               name: 'name',
               label: 'Task name',
-              initialValue: '',
+              initialValue: taskToEdit ? taskToEdit.name : '',
               type: 'text',
             },
             {
               name: 'description',
               label: 'Task description',
-              initialValue: '',
+              initialValue: taskToEdit ? taskToEdit.description : '',
               type: 'text',
             },
             {
               name: 'priority',
               label: 'Task priority',
-              initialValue: 'Low',
+              initialValue: taskToEdit ? taskToEdit.priority : 'Low',
               type: 'select',
               options: [
                 { value: 'Low', label: 'Low' },
@@ -518,19 +533,23 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
             {
               name: 'expectedEndDate',
               label: 'Expected End Date',
-              initialValue: new Date().toISOString(),
+              initialValue: taskToEdit
+                ? taskToEdit.expectedEndDate.toDate().toISOString()
+                : new Date().toISOString(),
               type: 'date',
             },
             {
               name: 'startDate',
               label: 'Expected Start Date',
-              initialValue: new Date().toISOString(),
+              initialValue: taskToEdit
+                ? taskToEdit.startDate.toDate().toISOString()
+                : new Date().toISOString(),
               type: 'date',
             },
             {
               name: 'state',
               label: 'Userstory state',
-              initialValue: 'Todo',
+              initialValue: taskToEdit ? taskToEdit.state : 'Todo',
               type: 'select',
               options: [
                 { value: 'Todo', label: 'Todo' },
@@ -540,35 +559,42 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
             },
           ]}
           onSubmit={values => {
-            // if (projectToEdit === null) {
-            // adding here because we don't have the id of the project at this point
+            if (taskToEdit === null) {
+              // adding here because we don't have the id of the project at this point
 
-            addData('Tasks', {
-              name: values.name,
-              priority: values.priority,
-              expectedEndDate: new Date(values.expectedEndDate),
-              createDate: new Date(),
-              startDate: new Date(values.startDate),
-              endDate: null,
-              state: values.state,
-              description: values.description,
-              pinedUser: `${state.user?.name} ${state.user?.surname}`,
-              userStoryId: userStoryId,
-            });
+              addData('Tasks', {
+                name: values.name,
+                priority: values.priority,
+                expectedEndDate: new Date(values.expectedEndDate),
+                createDate: new Date(),
+                startDate: new Date(values.startDate),
+                endDate: null,
+                state: values.state,
+                description: values.description,
+                pinedUser: `${state.user?.name} ${state.user?.surname}`,
+                userStoryId: userStoryId,
+              });
 
-            setShowModal(false);
+              setShowModal(false);
+            }
 
-            console.log(addErr);
-            // }
+            if (taskToEdit !== null) {
+              editData('Tasks', taskToEdit.id, {
+                id: taskToEdit.id,
+                name: values.name,
+                priority: values.priority,
+                expectedEndDate: new Date(values.expectedEndDate),
+                createDate: new Date(),
+                startDate: new Date(values.startDate),
+                endDate: null,
+                state: values.state,
+                description: values.description,
+                pinedUser: `${state.user?.name} ${state.user?.surname}`,
+                userStoryId: userStoryId,
+              });
 
-            // if (projectToEdit !== null) {
-            //   const editedProject: Project = {
-            //     id: projectToEdit.id,
-            //     title: values.title,
-            //     description: values.description,
-            //   };
-            //   handleEditProject(editedProject);
-            // }
+              handleClose();
+            }
           }}
           onReset={handleClose}
         />
