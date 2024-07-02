@@ -46,11 +46,15 @@ export default function Home() {
 
   return (
     <div>
-      <h2>Selected project</h2>
-      <h3>Name: {selectedProject?.title}</h3>
-      <h3>Description: {selectedProject?.description}</h3>
+      <div className="user-stories-list__head">
+        <h2>Selected project</h2>
+        <h3>Name: {selectedProject?.title}</h3>
+        <h3>Description: {selectedProject?.description}</h3>
+      </div>
       <UserStoriesList />
-      <span>Id: {selectedProject?.id}</span>
+      <span style={{ marginLeft: '36px', paddingBottom: '24px' }}>
+        Id: {selectedProject?.id}
+      </span>
     </div>
   );
 }

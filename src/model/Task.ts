@@ -9,5 +9,5 @@ export type Task = {
   startDate: any;
   endDate: any;
   state: string; // todo/doing/done
-  pinedUser: string; // id użytkownika
+  pinedUser: string;
 };

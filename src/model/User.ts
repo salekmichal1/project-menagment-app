@@ -3,5 +3,5 @@ export type User = {
   name: string;
   surname: string;
   userName: string;
-  position: string;
+  position: string; // devops, developer, admin
 };

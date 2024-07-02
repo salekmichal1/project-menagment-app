@@ -49,8 +49,11 @@ export default function Tasks() {
   // console.log(filterTasks);
   return (
     <div>
-      <h2>Tasks</h2>
-      <p>User story id: {storyId}</p>
+      <div className="tasks-list__head">
+        <h2>Tasks</h2>
+        <p>User story id: {storyId}</p>
+      </div>
+
       {isPending && <div>Loading...</div>}
       {!isPending && data && storyId && (
         <TaskList data={data} userStoryId={storyId} />

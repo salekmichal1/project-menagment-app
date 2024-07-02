@@ -34,6 +34,10 @@ import { useEditData } from '../../hooks/useEditData';
 import { useDeleteData } from '../../hooks/useDeleteData';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import dayjs from 'dayjs';
+import { useFetchData } from '../../hooks/useFetchData';
+import { User } from '../../model/User';
+import { set } from 'react-datepicker/dist/date_utils';
+import { start } from 'repl';
 
 interface TaskListProps {
   data: Task[];
@@ -70,12 +74,49 @@ function Row(props: {
   index: number;
   handleClick: (event: React.MouseEvent<unknown>, id: string) => void;
   handleEdit: (task: Task) => void;
+  editData: (collectionName: string, docId: string, data: any) => Promise<void>;
 }) {
-  const { row, isSelected, index, handleClick, handleEdit } = props;
+  const { row, isSelected, index, handleClick, handleEdit, editData } = props;
   const [open, setOpen] = React.useState(false);
+  const { data, error, isPending } = useFetchData<User>('Users');
+  const [users, setUsers] = useState<User[]>(
+    data.filter(
+      (user: User) =>
+        user.position === 'developer' || user.position === 'devops'
+    )
+  );
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUsers(
+      data.filter(
+        (user: User) =>
+          user.position === 'developer' || user.position === 'devops'
+      )
+    );
+  }, [data]);
+
+  useEffect(() => {
+    setSelectedUser(users[0]?.userName);
+  }, [users]);
 
   const isItemSelected = isSelected(row.id);
   const labelId = `enhanced-table-checkbox-${index}`;
+
+  const handleChanhgeUser = () => {
+    editData('Tasks', row.id, {
+      pinedUser: selectedUser,
+      state: 'In progress',
+      startDate: new Date(),
+    });
+  };
+
+  const handleClose = () => {
+    editData('Tasks', row.id, {
+      state: 'Done',
+      endDate: new Date(),
+    });
+  };
 
   return (
     <React.Fragment>
@@ -148,7 +189,7 @@ function Row(props: {
         </TableCell> */}
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
@@ -156,6 +197,25 @@ function Row(props: {
               </Typography>
               <Typography gutterBottom component="div">
                 {row.description}
+              </Typography>
+              <Typography gutterBottom component="div">
+                <select
+                  value={selectedUser || ''}
+                  onChange={newValue => setSelectedUser(newValue.target.value)}>
+                  {users.map(option => (
+                    <option key={option.id} value={option.userName}>
+                      {`${option.name} ${option.surname}`}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleChanhgeUser}
+                  className="btn tasks-list__btn">
+                  Select
+                </button>
+                <button onClick={handleClose} className="btn tasks-list__btn">
+                  Close
+                </button>
               </Typography>
             </Box>
           </Collapse>
@@ -479,6 +539,7 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
                     index={index}
                     handleClick={handleClick}
                     handleEdit={handleEdit}
+                    editData={editData}
                   />
                 ))}
                 {emptyRows > 0 && (
@@ -572,7 +633,7 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
                 endDate: null,
                 state: values.state,
                 description: values.description,
-                pinedUser: `${state.user?.name} ${state.user?.surname}`,
+                pinedUser: null,
                 userStoryId: userStoryId,
               });
 
@@ -590,7 +651,7 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
                 endDate: null,
                 state: values.state,
                 description: values.description,
-                pinedUser: `${state.user?.name} ${state.user?.surname}`,
+                pinedUser: values.pinedUser,
                 userStoryId: userStoryId,
               });
 
