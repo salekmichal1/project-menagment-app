@@ -7,6 +7,8 @@ import { useFetchData } from '../../hooks/useFetchData';
 import { useDeleteData } from '../../hooks/useDeleteData';
 import { useAddData } from '../../hooks/useAddData';
 import { useEditData } from '../../hooks/useEditData';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { projectDatabase } from '../../firebase/config';
 
 export default function ProjectList() {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -44,8 +46,36 @@ export default function ProjectList() {
     navigate('/');
   };
 
+  const deleteChildren = async function (projectId: string) {
+    const q = query(
+      collection(projectDatabase, 'UserStories'),
+      where('projectId', '==', projectId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async doc => {
+      // doc.data() is never undefined for query doc snapshots
+      const q = query(
+        collection(projectDatabase, 'Tasks'),
+        where('userStoryId', '==', doc.id)
+      );
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async doc => {
+        await deleteData('Tasks', doc.id);
+      });
+
+      await deleteData('UserStories', doc.id);
+    });
+
+    await deleteData('Projects', projectId);
+  };
+
   const handleDelete = function (id: string) {
-    deleteData('Projects', id);
+    if (localStorage.getItem('projectInWork') === id) {
+      localStorage.setItem('projectInWork', '');
+    }
+    deleteChildren(id);
   };
 
   return (

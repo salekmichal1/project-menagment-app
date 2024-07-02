@@ -8,6 +8,8 @@ import { useFetchData } from '../../hooks/useFetchData';
 import { useAddData } from '../../hooks/useAddData';
 import { useEditData } from '../../hooks/useEditData';
 import { useDeleteData } from '../../hooks/useDeleteData';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { projectDatabase } from '../../firebase/config';
 
 export default function UserStoriesList() {
   const { state } = useAuthContext();
@@ -43,8 +45,21 @@ export default function UserStoriesList() {
     setUserStoryToEdit(null);
   };
 
+  const deleteChildren = async function (userStoryId: string) {
+    const q = query(
+      collection(projectDatabase, 'Tasks'),
+      where('userStoryId', '==', userStoryId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(async doc => {
+      await deleteData('Tasks', doc.id);
+    });
+    await deleteData('UserStories', userStoryId);
+  };
+
   const handleDelete = function (id: string) {
-    deleteData('UserStories', id);
+    deleteChildren(id);
   };
 
   return (
