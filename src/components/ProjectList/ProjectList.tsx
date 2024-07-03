@@ -95,7 +95,7 @@ export default function ProjectList() {
         {fetchPending && <div>Loading...</div>}
         {!fetchPending &&
           data.map(project => (
-            <div key={project.id} className="project-list__project">
+            <div key={project.id} className="project-list__project ">
               <h2>{project.title}</h2>
               <p>{project.description}</p>
               <button

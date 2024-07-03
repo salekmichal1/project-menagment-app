@@ -2,8 +2,8 @@
   display: inline-block;
   background: #ff4500;
   color: #fff;
-  padding: 8px;
   border: 0;
+  min-width: 80px;
   border-radius: 4px;
   margin-left: 24px;
   cursor: pointer;

@@ -5,13 +5,15 @@
 }
 
 .project-list__project {
-  border: 1px solid #eee;
+  border: 1px solid;
+  border-color: var(--bg-color-card-border);
   box-shadow: 4px 5px 5px rgba(0, 0, 0, 0.1);
   padding: 10px;
   max-width: 400px;
   margin: 20px auto;
   border-radius: 4px;
   text-align: center;
+  background-color: var(--bg-color-card);
 }
 
 .project-list__project p,

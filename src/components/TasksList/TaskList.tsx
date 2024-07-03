@@ -10,7 +10,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
   TableSortLabel,
   Collapse,
   IconButton,
@@ -21,7 +20,12 @@ import {
   alpha,
   Tooltip,
   TablePagination,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { visuallyHidden } from '@mui/utils';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -36,8 +40,6 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import dayjs from 'dayjs';
 import { useFetchData } from '../../hooks/useFetchData';
 import { User } from '../../model/User';
-import { set } from 'react-datepicker/dist/date_utils';
-import { start } from 'repl';
 
 interface TaskListProps {
   data: Task[];
@@ -79,12 +81,7 @@ function Row(props: {
   const { row, isSelected, index, handleClick, handleEdit, editData } = props;
   const [open, setOpen] = React.useState(false);
   const { data, error, isPending } = useFetchData<User>('Users');
-  const [users, setUsers] = useState<User[]>(
-    data.filter(
-      (user: User) =>
-        user.position === 'developer' || user.position === 'devops'
-    )
-  );
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,9 +93,9 @@ function Row(props: {
     );
   }, [data]);
 
-  useEffect(() => {
-    setSelectedUser(users[0]?.userName);
-  }, [users]);
+  // useEffect(() => {
+  //   setSelectedUser(users[0]?.userName);
+  // }, [users]);
 
   const isItemSelected = isSelected(row.id);
   const labelId = `enhanced-table-checkbox-${index}`;
@@ -184,9 +181,6 @@ function Row(props: {
         </TableCell>
         <TableCell>{row.state}</TableCell>
         <TableCell>{row.pinedUser}</TableCell>
-        {/* <TableCell>
-          <Button onClick={() => handleEdit(task)}>Edit</Button>
-        </TableCell> */}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={11}>
@@ -198,22 +192,35 @@ function Row(props: {
               <Typography gutterBottom component="div">
                 {row.description}
               </Typography>
-              <Typography gutterBottom component="div">
-                <select
-                  value={selectedUser || ''}
-                  onChange={newValue => setSelectedUser(newValue.target.value)}>
-                  {users.map(option => (
-                    <option key={option.id} value={option.userName}>
-                      {`${option.name} ${option.surname}`}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleChanhgeUser}
-                  className="btn tasks-list__btn">
+              <Typography
+                gutterBottom
+                component="div"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                }}>
+                <FormControl sx={{ minWidth: 130 }} size="small">
+                  <InputLabel id="demo-select-small-label">
+                    Select user
+                  </InputLabel>
+                  <Select
+                    labelId="demo-select-small-label"
+                    value={selectedUser || ''}
+                    label="Select user"
+                    onChange={newValue =>
+                      setSelectedUser(newValue.target.value)
+                    }>
+                    {users.map(option => (
+                      <MenuItem key={option.id} value={option.userName}>
+                        {`${option.name} ${option.surname}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <button onClick={handleChanhgeUser} className="tasks-list__btn">
                   Select
                 </button>
-                <button onClick={handleClose} className="btn tasks-list__btn">
+                <button onClick={handleClose} className="tasks-list__btn">
                   Close
                 </button>
               </Typography>

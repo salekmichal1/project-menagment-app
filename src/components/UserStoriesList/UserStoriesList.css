@@ -1,28 +1,30 @@
 .user-stories-list {
-    max-width: 1200px;
-    margin: 0 auto;
-    margin-top: 36px;
-  }
-  
-  .user-stories-list__story {
-    border: 1px solid #eee;
-    box-shadow: 4px 5px 5px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    max-width: 400px;
-    margin: 20px auto;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
-  .user-stories-list__story p,
-  .user-stories-list__story h2 {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .user-stories-list__story button {
-    background-color: #555;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    padding: 12px;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 36px;
+}
+
+.user-stories-list__story {
+  border: 1px solid;
+  border-color: var(--bg-color-card-border);
+  box-shadow: 4px 5px 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  max-width: 400px;
+  margin: 20px auto;
+  border-radius: 4px;
+  text-align: center;
+  background-color: var(--bg-color-card);
+}
+
+.user-stories-list__story p,
+.user-stories-list__story h2 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.user-stories-list__story button {
+  background-color: #555;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding: 12px;
+}
