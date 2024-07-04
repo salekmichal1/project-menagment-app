@@ -24,6 +24,8 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { visuallyHidden } from '@mui/utils';
@@ -360,10 +362,18 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   hamdleDelete: () => void;
   setShowModal: (showModal: boolean) => void;
+  filter: string;
+  setFilter: (filter: string) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, hamdleDelete, setShowModal } = props;
+  const { numSelected, hamdleDelete, setShowModal, filter, setFilter } = props;
+  const prioOptions = ['Low', 'Medium', 'High', ''];
+  const stateOptions = [
+    { label: 'Todo' },
+    { label: 'In progress' },
+    { label: 'Done' },
+  ];
 
   return (
     <Toolbar
@@ -387,13 +397,34 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant="h6"
-          id="tableTitle"
-          component="div">
-          Nutrition
-        </Typography>
+        <>
+          <Typography
+            sx={{ flex: '1 1 100%' }}
+            variant="h6"
+            id="tableTitle"
+            component="div">
+            Nutrition
+          </Typography>
+          <Autocomplete
+            size="small"
+            style={{ marginRight: '10px' }}
+            disablePortal
+            id="combo-box-priority"
+            options={prioOptions}
+            value={filter}
+            onChange={(event, newValue) => setFilter(newValue ?? '')}
+            sx={{ width: 200 }}
+            renderInput={params => <TextField {...params} label="Priority" />}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            id="combo-box-state"
+            options={stateOptions}
+            sx={{ width: 200 }}
+            renderInput={params => <TextField {...params} label="State" />}
+          />
+        </>
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
@@ -435,6 +466,8 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
 
   // State for edit project
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  const [filter, setFilter] = useState<string>('');
 
   const handleEdit = (task: Task) => {
     setTaskToEdit(task);
@@ -511,10 +544,13 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
       //   page * rowsPerPage + rowsPerPage
       // ),
       data
+        .filter(task =>
+          task.priority.toLowerCase().includes(filter.toLowerCase())
+        )
         .slice()
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data]
+    [order, orderBy, page, rowsPerPage, data, filter]
   );
 
   return (
@@ -525,6 +561,8 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
             numSelected={selected.length}
             hamdleDelete={handleDelete}
             setShowModal={setShowModal}
+            filter={filter}
+            setFilter={setFilter}
           />
 
           <TableContainer component={Paper}>

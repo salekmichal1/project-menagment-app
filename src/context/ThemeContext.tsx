@@ -45,6 +45,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme') || 'light-theme';
     setTheme(storedTheme);
+    if (storedTheme === 'dark-theme') {
+      setToggleDarkMode(true);
+    } else {
+      setToggleDarkMode(false);
+    }
     document.body.className = storedTheme;
   }, []);
 
