@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { useThemeContext } from '../../hooks/useThemeContext';
+import { useLogout } from '../../hooks/useLogout';
 
 interface ThemeContextType {
   toggleTheme: () => void;
@@ -13,6 +14,7 @@ interface ThemeContextType {
 export default function Navbar() {
   const { toggleTheme, theme, toggleDarkMode } =
     useThemeContext() as ThemeContextType;
+  const { logout, error, isPending } = useLogout();
 
   return (
     <nav className="navbar">
@@ -37,6 +39,16 @@ export default function Navbar() {
           <NavLink className="navbar__list-link" to="/projects">
             Projects
           </NavLink>
+        </li>
+        <li className="navbar__list-item">
+          {isPending && (
+            <button className="btn navbar__logout-btn">Loading</button>
+          )}
+          {!isPending && (
+            <button className="btn navbar__logout-btn" onClick={logout}>
+              Logout
+            </button>
+          )}
         </li>
       </ul>
     </nav>

@@ -362,18 +362,24 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   hamdleDelete: () => void;
   setShowModal: (showModal: boolean) => void;
-  filter: string;
-  setFilter: (filter: string) => void;
+  filterPriority: string;
+  setFilterPriority: (filter: string) => void;
+  filterState: string;
+  setFilterState: (filter: string) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, hamdleDelete, setShowModal, filter, setFilter } = props;
-  const prioOptions = ['Low', 'Medium', 'High', ''];
-  const stateOptions = [
-    { label: 'Todo' },
-    { label: 'In progress' },
-    { label: 'Done' },
-  ];
+  const {
+    numSelected,
+    hamdleDelete,
+    setShowModal,
+    filterPriority,
+    setFilterPriority,
+    filterState,
+    setFilterState,
+  } = props;
+  const prioOptions = ['Low', 'Medium', 'High'];
+  const stateOptions = ['Todo', 'In progress', 'Done'];
 
   return (
     <Toolbar
@@ -405,25 +411,29 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             component="div">
             Nutrition
           </Typography>
-          <Autocomplete
-            size="small"
-            style={{ marginRight: '10px' }}
-            disablePortal
-            id="combo-box-priority"
-            options={prioOptions}
-            value={filter}
-            onChange={(event, newValue) => setFilter(newValue ?? '')}
-            sx={{ width: 200 }}
-            renderInput={params => <TextField {...params} label="Priority" />}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            id="combo-box-state"
-            options={stateOptions}
-            sx={{ width: 200 }}
-            renderInput={params => <TextField {...params} label="State" />}
-          />
+          <Tooltip title="Filter priority">
+            <Autocomplete
+              size="small"
+              style={{ marginRight: '10px' }}
+              disablePortal
+              id="combo-box-priority"
+              options={prioOptions}
+              onChange={(event, newValue) => setFilterPriority(newValue ?? '')}
+              sx={{ width: 200 }}
+              renderInput={params => <TextField {...params} label="Priority" />}
+            />
+          </Tooltip>
+          <Tooltip title="Filter state">
+            <Autocomplete
+              size="small"
+              disablePortal
+              id="combo-box-state"
+              options={stateOptions}
+              onChange={(event, newValue) => setFilterState(newValue ?? '')}
+              sx={{ width: 200 }}
+              renderInput={params => <TextField {...params} label="State" />}
+            />
+          </Tooltip>
         </>
       )}
       {numSelected > 0 ? (
@@ -467,7 +477,8 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
   // State for edit project
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
-  const [filter, setFilter] = useState<string>('');
+  const [filterPriority, setFilterPriority] = useState<string>('');
+  const [filterState, setFilterState] = useState<string>('');
 
   const handleEdit = (task: Task) => {
     setTaskToEdit(task);
@@ -544,13 +555,17 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
       //   page * rowsPerPage + rowsPerPage
       // ),
       data
-        .filter(task =>
-          task.priority.toLowerCase().includes(filter.toLowerCase())
+        .filter(
+          task =>
+            task.priority
+              .toLowerCase()
+              .includes(filterPriority.toLowerCase()) &&
+            task.state.toLowerCase().includes(filterState.toLowerCase())
         )
         .slice()
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data, filter]
+    [order, orderBy, page, rowsPerPage, data, filterPriority, filterState]
   );
 
   return (
@@ -561,8 +576,10 @@ export default function TaskList({ data, userStoryId }: TaskListProps) {
             numSelected={selected.length}
             hamdleDelete={handleDelete}
             setShowModal={setShowModal}
-            filter={filter}
-            setFilter={setFilter}
+            filterPriority={filterPriority}
+            setFilterPriority={setFilterPriority}
+            filterState={filterState}
+            setFilterState={setFilterState}
           />
 
           <TableContainer component={Paper}>

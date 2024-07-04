@@ -30,3 +30,8 @@
   text-transform: uppercase;
   color: #fff;
 }
+
+.navbar__logout-btn {
+  margin: 0;
+  padding: 10px;
+}

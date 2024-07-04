@@ -22,19 +22,19 @@ function App() {
           <Routes>
             <Route
               path="/login"
-              element={state.user ? <Login /> : <Navigate to="/" />}
+              element={!state.user ? <Login /> : <Navigate to="/" />}
             />
             <Route
               path="/"
-              element={!state.user ? <Home /> : <Navigate to="/login" />}
+              element={state.user ? <Home /> : <Navigate to="/login" />}
             />
             <Route
               path="/projects"
-              element={!state.user ? <Projects /> : <Navigate to="/login" />}
+              element={state.user ? <Projects /> : <Navigate to="/login" />}
             />
             <Route
               path="/tasks/:storyId"
-              element={!state.user ? <Tasks /> : <Navigate to="/login" />}
+              element={state.user ? <Tasks /> : <Navigate to="/login" />}
             />
           </Routes>
         </BrowserRouter>
