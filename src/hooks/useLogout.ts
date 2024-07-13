@@ -13,7 +13,7 @@ export function useLogout() {
     setIsPending(true);
     setError(null);
     try {
-      const refreshToken = sessionStorage.getItem('refreshToken');
+      const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
         throw new Error('No refresh token found');
       }
@@ -29,6 +29,8 @@ export function useLogout() {
       }
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('refreshToken');
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       dispatch({ type: UserSateType.LOGOUT, payload: null });
       setError(null);
       setIsPending(false);

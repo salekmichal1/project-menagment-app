@@ -1,0 +1,42 @@
+
+POST http://localhost:3000/token
+Content-Type: application/json
+
+{
+  "exp": 10
+}
+
+###
+
+GET http://localhost:3000/protected/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTc0MDA3MjIsImZvbyI6ImJhciIsImlhdCI6MTcxNzM5NzEyMn0.lGylicH6kKO80i7MYCf7yG0Dv-0L6fAAB1m5kCWbrUk
+
+###
+
+POST http://localhost:3000/refreshToken
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTc2NjkzMjksInVzZXIiOnsic3VybmFtZSI6IlNhbGVrIiwibmFtZSI6Ik1pY2hhbCIsInBvc2l0aW9uIjoiZGV2ZWxvcGVyIiwidXNlcm5hbWUiOiJtaWN0ZXMiLCJpZCI6InU3Smt6TEpGZVRaY21xM0VrZGJ2In0sImlhdCI6MTcxNzY2NTcyOX0.QxABaJ-i6Dh_cNb1jbH3eGWpeUsH5tZprOqTny8DSIM
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTc4ODE0MDcsInVzZXIiOnsic3VybmFtZSI6IlNhbGVrIiwibmFtZSI6Ik1pY2hhbCIsInBvc2l0aW9uIjoiZGV2ZWxvcGVyIiwidXNlcm5hbWUiOiJtaWN0ZXMiLCJpZCI6InU3Smt6TEpGZVRaY21xM0VrZGJ2In0sImlhdCI6MTcxNzg3NzgwN30.En6OWt3Rf12AFLlUQmnyuffd_lHwSv_eZvmvmwtbgaM"
+}
+
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "mictes",
+  "password": "test"
+}
+
+###
+
+DELETE  http://localhost:3000/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTc5NjU1NjEsInVzZXIiOnsic3VybmFtZSI6IlNhbGVrIiwibmFtZSI6Ik1pY2hhbCIsInBvc2l0aW9uIjoiZGV2ZWxvcGVyIiwidXNlcm5hbWUiOiJtaWN0ZXMiLCJpZCI6InU3Smt6TEpGZVRaY21xM0VrZGJ2In0sImlhdCI6MTcxNzk2MTk2MX0.IdkKjMISapVLrD2waqhbYyV7rKXHyqoIjwZCx1Uo2TM
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTc5NjYxOTksInVzZXIiOnsic3VybmFtZSI6IlNhbGVrIiwibmFtZSI6Ik1pY2hhbCIsInBvc2l0aW9uIjoiZGV2ZWxvcGVyIiwidXNlcm5hbWUiOiJtaWN0ZXMiLCJpZCI6InU3Smt6TEpGZVRaY21xM0VrZGJ2In0sImlhdCI6MTcxNzk2MjU5OX0.TkGqF_9qoIEyztgPZFSGHtD4ZyY6SppmKDQphGiu3x0"
+}

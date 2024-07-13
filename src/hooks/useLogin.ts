@@ -27,6 +27,8 @@ export function useLogin() {
       dispatch({ type: UserSateType.LOGIN, payload: loginUserData.user });
       sessionStorage.setItem('token', loginUserData.token);
       sessionStorage.setItem('refreshToken', loginUserData.refreshToken);
+      localStorage.setItem('token', loginUserData.token);
+      localStorage.setItem('refreshToken', loginUserData.refreshToken);
       console.log(loginUserData.refreshToken);
       setError(null);
       setIsPending(false);

@@ -34,7 +34,6 @@ const getCustomTheme = (mode: 'light' | 'dark') =>
             },
           }),
     },
-    // You can extend the theme with more customizations
   });
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {

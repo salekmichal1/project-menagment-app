@@ -3,7 +3,6 @@ import './Home.css';
 import { useNavigate } from 'react-router-dom';
 import { Project } from '../../model/Project';
 import UserStoriesList from '../../components/UserStoriesList/UserStoriesList';
-import { useFetchData } from '../../hooks/useFetchData';
 import { doc, getDoc } from 'firebase/firestore';
 import { projectDatabase } from '../../firebase/config';
 

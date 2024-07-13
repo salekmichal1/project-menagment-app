@@ -23,6 +23,7 @@ export default function Navbar() {
         <li className="navbar__list-item">
           <FormGroup>
             <FormControlLabel
+              style={{ transform: 'translateY(2px)' }}
               control={
                 <Switch checked={toggleDarkMode} onChange={toggleTheme} />
               }

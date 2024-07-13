@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 import { projectDatabase } from '../firebase/config';
 
 export function useAddData() {

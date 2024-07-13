@@ -1,6 +1,6 @@
 import './UserStoriesList.css';
 import { UserStory } from '../../model/UserStory';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModalForm from '../ModalForm/ModalForm';
 import { useAuthContext } from '../../hooks/useAuthContext';

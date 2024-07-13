@@ -27,9 +27,7 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material/Select';
 import { visuallyHidden } from '@mui/utils';
-
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteIcon from '@mui/icons-material/Delete';

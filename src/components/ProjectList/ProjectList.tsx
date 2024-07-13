@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Project } from '../../model/Project';
 import ModalForm from '../ModalForm/ModalForm';
 import './ProjectList.css';
@@ -54,7 +54,6 @@ export default function ProjectList() {
 
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(async doc => {
-      // doc.data() is never undefined for query doc snapshots
       const q = query(
         collection(projectDatabase, 'Tasks'),
         where('userStoryId', '==', doc.id)
